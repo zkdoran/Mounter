@@ -1,2 +1,4 @@
-class MountsController < ApplicationController
+module Api
+  class MountsController < ApplicationController
+  end
 end
