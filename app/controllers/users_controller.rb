@@ -5,7 +5,7 @@ class UsersController < ApplicationController
     if @user.save
       render 'api/users/create', status: :created
     else
-      render json: { success: false }, status: :bad_request
+      render json: { error: @user.error }, status: :bad_request
     end
 
     private
