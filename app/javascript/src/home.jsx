@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { handleErrors } from '@utils/fetchHelper';
 import 'dotenv/config';
-import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
 
 import './home.scss';
 
@@ -14,7 +12,12 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-
+    this.setState({ options: [
+      { value: 'Achievement', label: 'Achievement' },
+      { value: 'Quest', label: 'Quest' },
+      { value: 'Vendor', label: 'Vendor' },
+      { value: 'Drop', label: 'Drop' },
+    ]});
   }
 
   render() {
@@ -53,10 +56,39 @@ class Home extends React.Component {
               <p>Mounter is a web application that allows you to track your mounts in World of Warcraft.</p>
             </div>
           </div>
-          <div className="row">
-
+          <div className="row dropdowns">
+            <select>
+              <option value="Character">Character</option>
+              <option value={"words"}>words</option>
+            </select>
+          </div>
+          <div className="row mounts">
+            <div className="col m-3 p-3 g-3">
+              <h1 className="source">Achievements</h1>
+            </div>
+            <div className="col m-3 p-3 g-3">
+              <h1 className="source">Quests</h1>
+            </div>
+          </div>
+          <div className="row mounts">
+            <div className="col m-3 p-3 g-3">
+              <h1 className="source">Vendor</h1>
+            </div>
+            <div className="col m-3 p-3 g-3">
+              <h1 className="source">Drops</h1>
+            </div>
           </div>
         </div>
+        <footer className="p-3 bg-light">
+          <div className="container">
+            <div className="row">
+              <div className="col text-center">
+                <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
+                <p>Background photo by <a href="https://unsplash.com/@malikskyds?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Malik Skydsgaard</a> on <a href="https://unsplash.com/photos/ylGcmefqE_I?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
+              </div>
+            </div>
+          </div>
+        </footer>
       </React.Fragment>
     )
   }
