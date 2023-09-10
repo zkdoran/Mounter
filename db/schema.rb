@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_10_205830) do
+ActiveRecord::Schema.define(version: 2023_09_10_212945) do
 
   create_table "mounts", force: :cascade do |t|
     t.integer "mount_id"
@@ -20,6 +20,13 @@ ActiveRecord::Schema.define(version: 2023_09_10_205830) do
     t.string "source"
     t.string "faction"
     t.string "requirements"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username"
+    t.string "password"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
