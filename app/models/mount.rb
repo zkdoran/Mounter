@@ -1,2 +1,0 @@
-class Mount < ApplicationRecord
-end
