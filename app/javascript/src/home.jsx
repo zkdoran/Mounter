@@ -9,15 +9,32 @@ class Home extends React.Component {
   state = {
     characterMounts: [],
     detailedMounts: [],
+    realms: [],
+    regions: [],
   }
 
   componentDidMount() {
-    this.setState({ options: [
-      { value: 'Achievement', label: 'Achievement' },
-      { value: 'Quest', label: 'Quest' },
-      { value: 'Vendor', label: 'Vendor' },
-      { value: 'Drop', label: 'Drop' },
-    ]});
+    fetch('/api/realms')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          realms: data.realms,
+        })
+      })
+      .then(() => this.getRegion())
+  }
+
+  getRegion = () => {
+    fetch('/api/regions')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          regions: data.regions,
+        })
+      }
+    )
   }
 
   render() {
