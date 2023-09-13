@@ -10,19 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_10_221459) do
-
-  create_table "mounts", force: :cascade do |t|
-    t.integer "mount_id"
-    t.string "name"
-    t.integer "display_id"
-    t.string "description"
-    t.string "source"
-    t.string "faction"
-    t.string "requirements"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
+ActiveRecord::Schema.define(version: 2023_09_13_205510) do
 
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
