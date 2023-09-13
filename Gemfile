@@ -64,3 +64,5 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 
 gem "blizzard_api", "~> 3.4"
+
+gem "redis", "~> 4.8"
