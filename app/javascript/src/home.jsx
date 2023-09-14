@@ -1,20 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { handleErrors } from '@utils/fetchHelper';
+import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
 
 import './home.scss';
 
 class Home extends React.Component {
   state = {
-    characterMounts: [],
-    detailedMounts: [],
+    mounts: [],
     realms: [],
-    regions: [],
+    regions: ['us', 'eu', 'kr', 'tw'],
+    characterData: {},
+    characterMounts: [],
+    userRegion: '',
+    userRealm: '',
+    userCharacter: '',
   }
 
   componentDidMount() {
-    fetch('/api/realms')
+    fetch('/api/calls/realms')
       .then(handleErrors)
       .then(data => {
         console.log(data)
@@ -22,23 +26,47 @@ class Home extends React.Component {
           realms: data.realms,
         })
       })
-      .then(() => this.getRegion())
+      .then(() => this.getMounts())
+      .then(() => this.getCharacter())
   }
 
-  getRegion = () => {
-    fetch('/api/regions')
+  getMounts = () => {
+    fetch('/api/calls/mounts')
       .then(handleErrors)
       .then(data => {
         console.log(data)
         this.setState({
-          regions: data.regions,
+          mounts: data.mounts,
         })
-      }
-    )
+      })
+  }
+
+  getCharacter = () => {
+    fetch('/api/calls/character', safeCredentials({
+      method: 'POST',
+      body: JSON.stringify({
+        realm: 'illidan',
+        character: 'ralegna',
+        })
+      }))
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          characterData: {
+            characterId: data.id,
+            name: data.name,
+            realm: data.realm.name,
+            faction: data.faction.type,
+            class: data.character_class.name,
+            race: data.race.name,
+          }
+        })
+      })
   }
 
   render() {
-    const { characterMounts } = this.state;
+    const { realms, regions, mounts } = this.state;
     
     return (
       <React.Fragment>
@@ -74,25 +102,40 @@ class Home extends React.Component {
             </div>
           </div>
           <div className="row dropdowns">
-            <select>
-              <option value="Character">Character</option>
-              <option value={"words"}>words</option>
+            <select className="col">
+              <option>Select a Region</option>
+              {regions.map(region => {
+                return (
+                  <option key={region} value={region}>{region.toUpperCase()}</option>
+                )
+              })}
+            </select>
+            <select className="col">
+              <option>Select a Realm</option>
+              {realms.map(realm => {
+                return (
+                  <option key={realm.id} value={realm.slug}>{realm.name.en_US}</option>
+                )
+              })}
             </select>
           </div>
           <div className="row mounts">
             <div className="col m-3 p-3 g-3">
-              <h1 className="source">Achievements</h1>
-            </div>
-            <div className="col m-3 p-3 g-3">
-              <h1 className="source">Quests</h1>
-            </div>
-          </div>
-          <div className="row mounts">
-            <div className="col m-3 p-3 g-3">
-              <h1 className="source">Vendor</h1>
-            </div>
-            <div className="col m-3 p-3 g-3">
-              <h1 className="source">Drops</h1>
+              <h1 className="source">Mounts</h1>
+              <ul>
+                {mounts.map(mount => {
+                  return (
+                    <li key={mount.id}>
+                      <div className="card">
+                        <div className="card-body">
+                          <h5 className="card-title">{mount.name.en_US}</h5>
+                          <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank" className="btn btn-primary">Wowhead</a>
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </div>
         </div>

@@ -7,20 +7,28 @@ module Api
       config.use_cache = true
       config.redis_host = ENV['REDIS_HOST']
       config.redis_port = ENV['REDIS_PORT']
-    end
-
-    def region
-      region = BlizzardApi::Wow.region
-      region_data = region.index
-
-      render json: region_data
+      config.cache_access_token = true
     end
 
     def realm
       realm = BlizzardApi::Wow.realm
-      realm_data = realm.index
+      @realm_data = realm.index
 
-      render json: realm_data
+      render 'api/calls/realm', status: :ok
+    end
+
+    def mounts
+      mount = BlizzardApi::Wow.mount
+      @mount_data = mount.index
+
+      render 'api/calls/mounts', status: :ok
+    end
+
+    def character
+      @character_data = BlizzardApi::Wow.character_profile.get(params[:realm], params[:character])
+      @character_mounts = BlizzardApi::Wow.character_mounts.mounts(params[:realm], params[:character])
+
+      render 'api/calls/character', status: :ok
     end
   end
 end
