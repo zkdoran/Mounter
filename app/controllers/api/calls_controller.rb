@@ -10,25 +10,30 @@ module Api
       config.cache_access_token = true
     end
 
-    def realm
-      realm = BlizzardApi::Wow.realm
+    def realms
+      realm = BlizzardApi::Wow::Realm.new region: params[:region]
+
       @realm_data = realm.index
 
-      render 'api/calls/realm', status: :ok
+      render json: @realm_data , status: :ok
     end
 
     def mounts
-      mount = BlizzardApi::Wow.mount
-      @mount_data = mount.index
+      mount = BlizzardApi::Wow::Mount.new
+      
+      @mount_index = mount.index
 
-      render 'api/calls/mounts', status: :ok
+      render json: @mount_index, status: :ok
     end
 
-    def character
-      @character_data = BlizzardApi::Wow.character_profile.get(params[:realm], params[:character])
-      @character_mounts = BlizzardApi::Wow.character_mounts.mounts(params[:realm], params[:character])
+    def profile
+      character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
 
-      render 'api/calls/character', status: :ok
+      @character_data = character.get(params[:realm], params[:character])
+
+      @character_data[:mounts] = character.mounts(params[:realm], params[:character])
+
+      render json: @character_data, status: :ok
     end
   end
 end

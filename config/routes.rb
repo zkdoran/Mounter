@@ -5,9 +5,8 @@ Rails.application.routes.draw do
     resources :users, only: [:create]
     resources :sessions, only: [:create, :destroy]
 
-    get "/calls/realms", to: "calls#realm"
-    get "/calls/regions", to: "calls#region"
+    get "/calls/realms/:region", to: "calls#realms"
     get "/calls/mounts", to: "calls#mounts"
-    post "/calls/character", to: "calls#character"
+    get "/calls/profile/:region/:realm/:character", to: "calls#profile"
   end
 end

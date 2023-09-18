@@ -9,16 +9,16 @@ class Home extends React.Component {
   state = {
     mounts: [],
     realms: [],
-    regions: ['us', 'eu', 'kr', 'tw'],
+    region: ['us', 'eu', 'kr', 'tw'],
     characterData: {},
     characterMounts: [],
-    userRegion: '',
+    userRegion: 'us',
     userRealm: '',
     userCharacter: '',
   }
 
   componentDidMount() {
-    fetch('/api/calls/realms')
+    fetch(`/api/calls/realms/${this.state.userRegion}`)
       .then(handleErrors)
       .then(data => {
         console.log(data)
@@ -27,7 +27,6 @@ class Home extends React.Component {
         })
       })
       .then(() => this.getMounts())
-      .then(() => this.getCharacter())
   }
 
   getMounts = () => {
@@ -41,32 +40,19 @@ class Home extends React.Component {
       })
   }
 
-  getCharacter = () => {
-    fetch('/api/calls/character', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        realm: 'illidan',
-        character: 'ralegna',
-        })
-      }))
+  getProfile = () => {
+    fetch(`/api/calls/profile/${this.state.userRegion}/${this.state.userRealm}/${this.state.userCharacter}`)
       .then(handleErrors)
       .then(data => {
         console.log(data)
         this.setState({
-          characterData: {
-            characterId: data.id,
-            name: data.name,
-            realm: data.realm.name,
-            faction: data.faction.type,
-            class: data.character_class.name,
-            race: data.race.name,
-          }
+          characterData: data,
         })
       })
   }
 
   render() {
-    const { realms, regions, mounts } = this.state;
+    const { realms, region, mounts, userRegion } = this.state;
     
     return (
       <React.Fragment>
@@ -102,15 +88,23 @@ class Home extends React.Component {
             </div>
           </div>
           <div className="row dropdowns">
-            <select className="col">
+            <select className="col" onChange={(e) => {
+              this.setState({
+                userRegion: e.target.value,
+              })
+            }}>
               <option>Select a Region</option>
-              {regions.map(region => {
+              {region.map(region => {
                 return (
                   <option key={region} value={region}>{region.toUpperCase()}</option>
                 )
               })}
             </select>
-            <select className="col">
+            <select className="col" onChange={(e) => {
+              this.setState({
+                userRealm: e.target.value,
+              })
+            }}>
               <option>Select a Realm</option>
               {realms.map(realm => {
                 return (
@@ -118,6 +112,12 @@ class Home extends React.Component {
                 )
               })}
             </select>
+            <input className="col" type="text" placeholder="Character Name" onChange={(e) => {
+              this.setState({
+                userCharacter: e.target.value,
+              })
+            }}/>
+            <button className="col" onClick={this.getProfile}>Search</button>
           </div>
           <div className="row mounts">
             <div className="col m-3 p-3 g-3">
@@ -127,6 +127,7 @@ class Home extends React.Component {
                   return (
                     <li key={mount.id}>
                       <div className="card">
+                        <img src={``} className="card-img-top" alt="..." />
                         <div className="card-body">
                           <h5 className="card-title">{mount.name.en_US}</h5>
                           <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank" className="btn btn-primary">Wowhead</a>
