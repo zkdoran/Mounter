@@ -20,10 +20,14 @@ module Api
 
     def mounts
       mount = BlizzardApi::Wow::Mount.new
-      
-      @mount_index = mount.index
 
-      render json: @mount_index, status: :ok
+      mount_index = mount.index
+
+      mount_index[:mounts].each do |mount|
+        mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+      end
+
+      render json: mount_index, status: :ok
     end
 
     def profile

@@ -119,25 +119,27 @@ class Home extends React.Component {
             }}/>
             <button className="col" onClick={this.getProfile}>Search</button>
           </div>
+          <div className="row filters">
+            <div className="col">
+              <button className="btn btn-primary">Collected</button>
+              <button className="btn btn-primary">Not Collected</button>
+            </div>
+          </div>
           <div className="row mounts">
-            <div className="col m-3 p-3 g-3">
-              <h1 className="source">Mounts</h1>
-              <ul>
-                {mounts.map(mount => {
+            <h1 className="source">Mounts</h1>
+            {mounts.map(mount => {
                   return (
-                    <li key={mount.id}>
-                      <div className="card">
-                        <img src={``} className="card-img-top" alt="..." />
+                    <div key={mount.id} className="col mb-3">                           
+                      <div className="card" style={{width: 14 + 'rem'}}>
+                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays[0].id}.jpg`} className="card-img-top" alt="No Image Available. Blame Blizzard." />
                         <div className="card-body">
                           <h5 className="card-title">{mount.name.en_US}</h5>
-                          <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank" className="btn btn-primary">Wowhead</a>
+                          <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
                         </div>
                       </div>
-                    </li>
+                    </div>
                   )
-                })}
-              </ul>
-            </div>
+                })}          
           </div>
         </div>
         <footer className="p-3 bg-light">
