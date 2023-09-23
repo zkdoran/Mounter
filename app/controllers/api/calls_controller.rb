@@ -13,9 +13,9 @@ module Api
     def realms
       realm = BlizzardApi::Wow::Realm.new region: params[:region]
 
-      @realm_data = realm.index
+      realm_data = realm.index
 
-      render json: @realm_data , status: :ok
+      render json: realm_data , status: :ok
     end
 
     def mounts
@@ -33,11 +33,11 @@ module Api
     def profile
       character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
 
-      @character_data = character.get(params[:realm], params[:character])
+      character_data = character.get(params[:realm], params[:character])
 
-      @character_data[:mounts] = character.mounts(params[:realm], params[:character])
+      character_data[:mounts] = character.mounts(params[:realm], params[:character])
 
-      render json: @character_data, status: :ok
+      render json: character_data, status: :ok
     end
   end
 end
