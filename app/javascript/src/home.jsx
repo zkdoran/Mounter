@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
+import myImg from '../../assets/images/no-image-icon-23500.jpg';
 
 import './home.scss';
 
@@ -10,11 +11,16 @@ class Home extends React.Component {
     mounts: [],
     realms: [],
     region: ['us', 'eu', 'kr', 'tw'],
+    races: [],
+    classes: [],
     characterData: {},
-    characterMounts: [],
+    collectedMounts: [],
+    uncollectedMounts: [],
+    buttonDisabled: true,
     userRegion: 'us',
     userRealm: '',
     userCharacter: '',
+    source: ['ACHIEVEMENT', 'DISCOVERY', 'DROP', 'PETSTORE', 'PROFESSION', 'PROMOTION', 'QUEST', 'TCG', 'VENDOR', 'WORLDEVENT'],
   }
 
   componentDidMount() {
@@ -27,6 +33,8 @@ class Home extends React.Component {
         })
       })
       .then(() => this.getMounts())
+      .then(() => this.getRaces())
+      .then(() => this.getClasses())
   }
 
   getMounts = () => {
@@ -40,6 +48,28 @@ class Home extends React.Component {
       })
   }
 
+  getRaces = () => {
+    fetch('/api/calls/races')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          races: data.races,
+        })
+      })
+  }
+
+  getClasses = () => {
+    fetch('/api/calls/classes')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          classes: data.classes,
+        })
+      })
+  }
+
   getProfile = () => {
     fetch(`/api/calls/profile/${this.state.userRegion}/${this.state.userRealm}/${this.state.userCharacter}`)
       .then(handleErrors)
@@ -47,15 +77,38 @@ class Home extends React.Component {
         console.log(data)
         this.setState({
           characterData: data,
+          buttonDisabled: false,
         })
       })
+      .then(() => this.mountFilter())
   }
 
+  mountFilter = () => {
+    const { characterData, mounts } = this.state;
+    const characterMounts = characterData.mounts.mounts.map(mount => {
+      return mount.mount.id
+    })
+
+    const collectedMounts = mounts.filter(mount => {
+      return characterMounts.includes(mount.id)
+    })
+
+    const uncollectedMounts = mounts.filter(mount => {
+      return !characterMounts.includes(mount.id)
+    })
+
+    this.setState({
+      collectedMounts: collectedMounts,
+      uncollectedMounts: uncollectedMounts,
+    })
+  }
+
+
   render() {
-    const { realms, region, mounts, userRegion } = this.state;
+    const { realms, region, races, classes, mounts, collectedMounts, uncollectedMounts, buttonDisabled } = this.state;
     
     return (
-      <React.Fragment>
+      <div className="home">
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
           <div className="container-fluid">
             <a className="navbar-brand" href="#">Mounter</a>
@@ -121,8 +174,9 @@ class Home extends React.Component {
           </div>
           <div className="row filters">
             <div className="col">
-              <button className="btn btn-primary">Collected</button>
-              <button className="btn btn-primary">Not Collected</button>
+              <button className="btn btn-primary">All</button>
+              <button className="btn btn-primary" disabled={buttonDisabled}>Collected</button>
+              <button className="btn btn-primary" disabled={buttonDisabled}>Not Collected</button>
             </div>
           </div>
           <div className="row mounts">
@@ -131,7 +185,10 @@ class Home extends React.Component {
                   return (
                     <div key={mount.id} className="col mb-3">                           
                       <div className="card" style={{width: 14 + 'rem'}}>
-                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays[0].id}.jpg`} className="card-img-top" alt="No Image Available. Blame Blizzard." />
+                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays[0].id}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
+                          e.target.src = myImg
+                          e.target.alt = 'No Image Found'
+                        }} />
                         <div className="card-body">
                           <h5 className="card-title">{mount.name.en_US}</h5>
                           <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
@@ -147,12 +204,11 @@ class Home extends React.Component {
             <div className="row">
               <div className="col text-center">
                 <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
-                <p>Background photo by <a href="https://unsplash.com/@malikskyds?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Malik Skydsgaard</a> on <a href="https://unsplash.com/photos/ylGcmefqE_I?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
               </div>
             </div>
           </div>
         </footer>
-      </React.Fragment>
+      </div>
     )
   }
 }
