@@ -8,5 +8,7 @@ Rails.application.routes.draw do
     get "/calls/realms/:region", to: "calls#realms"
     get "/calls/mounts", to: "calls#mounts"
     get "/calls/profile/:region/:realm/:character", to: "calls#profile"
+    get "/calls/races", to: "calls#races"
+    get "/calls/classes", to: "calls#classes"
   end
 end

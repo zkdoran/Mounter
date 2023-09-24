@@ -18,6 +18,20 @@ module Api
       render json: realm_data , status: :ok
     end
 
+    def races
+      race = BlizzardApi::Wow::PlayableRace.new
+
+      race_data = race.index
+
+      render json: race_data, status: :ok
+    end
+
+    def classes
+      class_data = BlizzardApi::Wow::PlayableClass.new.index
+
+      render json: class_data, status: :ok
+    end
+
     def mounts
       mount = BlizzardApi::Wow::Mount.new
 
