@@ -9,8 +9,9 @@ import './home.scss';
 class Home extends React.Component {
   state = {
     mounts: [],
-    realms: [],
+    realms: {},
     region: ['us', 'eu', 'kr', 'tw'],
+    realmsRegion: [],
     races: [],
     classes: [],
     characterData: {},
@@ -24,17 +25,21 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`/api/calls/realms/${this.state.userRegion}`)
+    this.getRealms();
+    this.getMounts();
+    this.getRaces();
+    this.getClasses();
+  }
+
+  getRealms = () => {
+    fetch('/api/calls/realms/')
       .then(handleErrors)
       .then(data => {
         console.log(data)
         this.setState({
-          realms: data.realms,
+          realms: data,
         })
       })
-      .then(() => this.getMounts())
-      .then(() => this.getRaces())
-      .then(() => this.getClasses())
   }
 
   getMounts = () => {
@@ -103,9 +108,19 @@ class Home extends React.Component {
     })
   }
 
+  realmFilter = () => {
+    const { realms, userRegion } = this.state;
+
+    const realmsRegion = realms[userRegion];
+
+    this.setState({
+      realmsRegion: realmsRegion,
+    })
+  }
+
 
   render() {
-    const { realms, region, races, classes, mounts, collectedMounts, uncollectedMounts, buttonDisabled } = this.state;
+    const { realms, region, races, classes, mounts, collectedMounts, uncollectedMounts, buttonDisabled, realmDisabled, realmsRegion } = this.state;
     
     return (
       <div className="home">
@@ -141,10 +156,10 @@ class Home extends React.Component {
             </div>
           </div>
           <div className="row dropdowns">
-            <select className="col" onChange={(e) => {
+            <select className="col region" onChange={(e) => {
               this.setState({
                 userRegion: e.target.value,
-              })
+              }, () => this.realmFilter())
             }}>
               <option>Select a Region</option>
               {region.map(region => {
@@ -153,19 +168,19 @@ class Home extends React.Component {
                 )
               })}
             </select>
-            <select className="col" onChange={(e) => {
+            <select className="col realm" disabled={realmDisabled} onChange={(e) => {
               this.setState({
                 userRealm: e.target.value,
               })
             }}>
               <option>Select a Realm</option>
-              {realms.map(realm => {
+              {realmsRegion.map(realm => {
                 return (
                   <option key={realm.id} value={realm.slug}>{realm.name.en_US}</option>
                 )
               })}
             </select>
-            <input className="col" type="text" placeholder="Character Name" onChange={(e) => {
+            <input className="col characterM" type="text" placeholder="Character Name" onChange={(e) => {
               this.setState({
                 userCharacter: e.target.value,
               })
@@ -191,7 +206,7 @@ class Home extends React.Component {
                         }} />
                         <div className="card-body">
                           <h5 className="card-title">{mount.mount_detail.name.en_US}</h5>
-                          {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source.name.en_US}</p> : null}
+                          {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source.name.en_US}</p> : <p className="card-text">Source: Unknown</p>}
                           <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
                         </div>
                       </div>

@@ -10,10 +10,29 @@ module Api
       config.cache_access_token = true
     end
 
-    def realms
-      realm = BlizzardApi::Wow::Realm.new region: params[:region]
+    def realms     
+      us_realm = BlizzardApi::Wow::Realm.new region: 'us'
 
-      realm_data = realm.index
+      us_data = us_realm.index
+
+      eu_realm = BlizzardApi::Wow::Realm.new region: 'eu'
+
+      eu_data = eu_realm.index
+
+      kr_realm = BlizzardApi::Wow::Realm.new region: 'kr'
+
+      kr_data = kr_realm.index
+
+      tw_realm = BlizzardApi::Wow::Realm.new region: 'tw'
+
+      tw_data = tw_realm.index
+
+      realm_data = {
+        us: us_data[:realms],
+        eu: eu_data[:realms],
+        kr: kr_data[:realms],
+        tw: tw_data[:realms]
+      }
 
       render json: realm_data , status: :ok
     end
