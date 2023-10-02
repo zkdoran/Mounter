@@ -95,6 +95,8 @@ module Api
         race[:name] = race[:name][:en_US]
         race.delete(:key)
       end
+      
+      data[:races].delete_if { |race| race[:id] == 70 }
     end
 
     def format_mounts(data)
