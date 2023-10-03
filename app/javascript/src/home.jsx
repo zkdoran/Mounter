@@ -8,20 +8,23 @@ import './home.scss';
 
 class Home extends React.Component {
   state = {
-    mounts: [],
     realms: {},
     region: ['us', 'eu', 'kr', 'tw'],
-    realmsRegion: [],
+    mounts: [],
     races: [],
     classes: [],
     characterData: {},
     collectedMounts: [],
     uncollectedMounts: [],
     buttonDisabled: true,
-    userRegion: 'us',
+    realmList: [],
+    userRegion: '',
     userRealm: '',
     userCharacter: '',
     source: ['ACHIEVEMENT', 'DISCOVERY', 'DROP', 'PETSTORE', 'PROFESSION', 'PROMOTION', 'QUEST', 'TCG', 'VENDOR', 'WORLDEVENT'],
+    searchError: '',
+    listChoice: '',
+    mountDisplay: [],
   }
 
   componentDidMount() {
@@ -48,9 +51,10 @@ class Home extends React.Component {
       .then(data => {
         console.log(data)
         this.setState({
-          mounts: data.mounts,
+          mounts: data,
         })
       })
+      .then(() => this.mountSwitch())
   }
 
   getRaces = () => {
@@ -59,7 +63,7 @@ class Home extends React.Component {
       .then(data => {
         console.log(data)
         this.setState({
-          races: data.races,
+          races: data,
         })
       })
   }
@@ -70,12 +74,23 @@ class Home extends React.Component {
       .then(data => {
         console.log(data)
         this.setState({
-          classes: data.classes,
+          classes: data,
         })
       })
   }
 
   getProfile = () => {
+    this.setState({
+      searchError: '',
+    })
+
+    if (this.state.userRegion === '' || this.state.userRealm === '' || this.state.userCharacter === '') {
+      this.setState({
+        searchError: 'Please fill out all fields',
+      })
+      return;
+    }
+
     fetch(`/api/calls/profile/${this.state.userRegion}/${this.state.userRealm}/${this.state.userCharacter}`)
       .then(handleErrors)
       .then(data => {
@@ -86,41 +101,128 @@ class Home extends React.Component {
         })
       })
       .then(() => this.mountFilter())
+      .catch(error => {
+        console.log(error)
+        this.setState({
+          searchError: 'Character not found',
+        })
+      })
   }
 
   mountFilter = () => {
     const { characterData, mounts } = this.state;
-    const characterMounts = characterData.mounts.mounts.map(mount => {
-      return mount.mount.id
-    })
-
-    const collectedMounts = mounts.filter(mount => {
-      return characterMounts.includes(mount.id)
-    })
-
-    const uncollectedMounts = mounts.filter(mount => {
-      return !characterMounts.includes(mount.id)
-    })
-
+    const characterMounts = characterData.mounts.map(mount => mount.id);
+  
+    const collectedMounts = mounts.filter(mount => characterMounts.includes(mount.id));
+  
+    // Update should_exclude_if_uncollected to false for collected mounts
+    const updatedCollectedMounts = collectedMounts.map(mount => ({
+      ...mount,
+      mount_detail: {
+        ...mount.mount_detail,
+        should_exclude_if_uncollected: false,
+      },
+    }));
+  
+    const uncollectedMounts = mounts.filter(mount => !characterMounts.includes(mount.id));
+  
     this.setState({
-      collectedMounts: collectedMounts,
+      collectedMounts: updatedCollectedMounts,
       uncollectedMounts: uncollectedMounts,
+    });
+  
+    this.mountSwitch();
+  }
+  
+
+  handleRegionChange = (e) => {
+    this.setState({
+      userRegion: e.target.value,
+    }, () => this.realmSwitch())
+  }
+
+  handleRealmChange = (e) => {
+    this.setState({
+      userRealm: e.target.value,
     })
   }
 
-  realmFilter = () => {
+  handleCharacterChange = (e) => {
+    this.setState({
+      userCharacter: e.target.value,
+    })
+  }
+
+  realmSwitch = () => {
     const { realms, userRegion } = this.state;
 
-    const realmsRegion = realms[userRegion];
+    const us_realms = realms.us;
+    const eu_realms = realms.eu;
+    const kr_realms = realms.kr;
+    const tw_realms = realms.tw;
 
-    this.setState({
-      realmsRegion: realmsRegion,
-    })
+    switch(userRegion) {
+      case 'us':
+        this.setState({
+          realmList: us_realms,
+        })
+        break;
+      case 'eu':
+        this.setState({
+          realmList: eu_realms,
+        })
+        break;
+      case 'kr':
+        this.setState({
+          realmList: kr_realms,
+        })
+        break;
+      case 'tw':
+        this.setState({
+          realmList: tw_realms,
+        })
+        break;
+      default:
+        this.setState({
+          realmList: [],
+        })
+    }
   }
 
+  listChoice = (e) => {
+    this.setState({
+      listChoice: e.target.value,
+    }, () => this.mountSwitch())
+  }
+
+  mountSwitch = () => {
+    const { mounts, collectedMounts, uncollectedMounts, listChoice} = this.state;
+
+    switch(listChoice) {
+      case 'all':
+        this.setState({
+          mountDisplay: mounts,
+        })
+        break;
+      case 'collected':
+        this.setState({
+          mountDisplay: collectedMounts,
+        })
+        break;
+      case 'uncollected':
+        this.setState({
+          mountDisplay: uncollectedMounts,
+        })
+        break;
+      default:
+        this.setState({
+          mountDisplay: mounts,
+        })
+    }
+  }
 
   render() {
-    const { realms, region, races, classes, mounts, collectedMounts, uncollectedMounts, buttonDisabled, realmDisabled, realmsRegion } = this.state;
+    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError } = this.state;
     
     return (
       <div className="home">
@@ -156,11 +258,7 @@ class Home extends React.Component {
             </div>
           </div>
           <div className="row dropdowns">
-            <select className="col region" onChange={(e) => {
-              this.setState({
-                userRegion: e.target.value,
-              }, () => this.realmFilter())
-            }}>
+            <select className="col region" onChange={this.handleRegionChange}>
               <option>Select a Region</option>
               {region.map(region => {
                 return (
@@ -168,44 +266,48 @@ class Home extends React.Component {
                 )
               })}
             </select>
-            <select className="col realm" disabled={realmDisabled} onChange={(e) => {
-              this.setState({
-                userRealm: e.target.value,
-              })
-            }}>
+            <select className="col realm" onChange={this.handleRealmChange}>
               <option>Select a Realm</option>
-              {realmsRegion.map(realm => {
+              {realmList.map(realm => {
                 return (
-                  <option key={realm.id} value={realm.slug}>{realm.name.en_US}</option>
+                  <option key={realm.id} value={realm.slug}>{realm.name}</option>
                 )
               })}
             </select>
-            <input className="col characterM" type="text" placeholder="Character Name" onChange={(e) => {
-              this.setState({
-                userCharacter: e.target.value,
-              })
-            }}/>
+            <input className="col characterM" type="text" placeholder="Character Name" onChange={this.handleCharacterChange}/>
             <button className="col" onClick={this.getProfile}>Search</button>
+          </div>
+          <div className="row">
+            {searchError ?
+              <div className="alert alert-danger" role="alert">
+                {searchError}
+              </div>
+              : null
+            }
           </div>
           <div className="row filters">
             <div className="col">
-              <button className="btn btn-primary">All</button>
-              <button className="btn btn-primary" disabled={buttonDisabled}>Collected</button>
-              <button className="btn btn-primary" disabled={buttonDisabled}>Not Collected</button>
+              <button className="btn btn-primary" onClick={this.listChoice} value="all">All</button>
+              <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="collected">Collected</button>
+              <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="uncollected">Not Collected</button>
             </div>
           </div>
           <div className="row mounts">
             <h1 className="source">Mounts</h1>
-            {mounts.map(mount => {
+            {mountDisplay.map(mount => {
+                  if (mount.mount_detail.should_exclude_if_uncollected) {
+                    return null;
+                  }
+
                   return (
                     <div key={mount.id} className="col mb-3">                           
                       <div className="card" style={{width: 14 + 'rem'}}>
-                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays[0].id}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
+                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
                           e.target.src = myImg
                           e.target.alt = 'No Image Found'
                         }} />
                         <div className="card-body">
-                          <h5 className="card-title">{mount.mount_detail.name.en_US}</h5>
+                          <h5 className="card-title">{mount.name}</h5>
                           {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source.name.en_US}</p> : <p className="card-text">Source: Unknown</p>}
                           <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
                         </div>
