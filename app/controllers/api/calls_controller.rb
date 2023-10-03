@@ -11,16 +11,20 @@ module Api
     end
 
     def realms     
-      us_data = BlizzardApi::Wow::Realm.new.index region: 'us'
+      us = BlizzardApi::Wow::Realm.new region: 'us'
+      us_data = us.index
       format_realm(us_data)
 
-      eu_data = BlizzardApi::Wow::Realm.new.index region: 'eu'
+      eu = BlizzardApi::Wow::Realm.new region: 'eu'
+      eu_data = eu.index
       format_realm(eu_data)
 
-      kr_data = BlizzardApi::Wow::Realm.new.index region: 'kr'
+      kr = BlizzardApi::Wow::Realm.new region: 'kr'
+      kr_data = kr.index
       format_realm(kr_data)
 
-      tw_data = BlizzardApi::Wow::Realm.new.index region: 'tw'
+      tw = BlizzardApi::Wow::Realm.new region: 'tw'
+      tw_data = tw.index
       format_realm(tw_data)
 
       realm_data = {
