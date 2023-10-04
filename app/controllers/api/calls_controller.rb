@@ -108,6 +108,29 @@ module Api
         mount[:name] = mount[:name][:en_US]
         mount.delete(:key)
         mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
+        
+        if mount[:mount_detail][:faction]
+          mount[:mount_detail][:faction] = mount[:mount_detail][:faction][:name][:en_US]
+        end
+
+        if mount[:mount_detail][:source]
+          mount[:mount_detail][:source] = mount[:mount_detail][:source][:name][:en_US]
+        end
+
+        if mount[:mount_detail][:requirements]
+          if mount[:mount_detail][:requirements][:faction]
+            mount[:mount_detail][:requirements][:faction] = mount[:mount_detail][:requirements][:faction][:name][:en_US]
+          end
+
+          if mount[:mount_detail][:requirements][:classes]
+            mount[:mount_detail][:requirements][:classes] = mount[:mount_detail][:requirements][:classes][0][:name][:en_US]
+          end
+
+          if mount[:mount_detail][:requirements][:races]
+            mount[:mount_detail][:requirements][:races] = mount[:mount_detail][:requirements][:races][0][:name][:en_US]
+          end 
+        end
+       
         mount[:mount_detail].delete(:_links)
         mount[:mount_detail].delete(:name)
         mount[:mount_detail].delete(:id)
