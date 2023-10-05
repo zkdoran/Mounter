@@ -307,8 +307,6 @@ class Home extends React.Component {
   
     console.log(filteredMounts);
   };
-  
-  
 
   render() {
     const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source } = this.state;
