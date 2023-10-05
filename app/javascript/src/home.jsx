@@ -410,9 +410,9 @@ class Home extends React.Component {
             <div className="col">
               <select className="col classes" onChange={this.handleClassChange}>
                 <option>Select a Class</option>
-                {classes.map(classs => {
+                {classes.map(playableClass => {
                   return (
-                    <option key={classs.id} value={classs.name}>{classs.name}</option>
+                    <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
                   )
                 })}
               </select>
