@@ -5,7 +5,6 @@ import 'dotenv/config';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 
 import './home.scss';
-import { use } from '@rails/webpacker/package/rules/babel';
 
 class Home extends React.Component {
   state = {
