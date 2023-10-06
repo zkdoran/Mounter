@@ -5,6 +5,7 @@ import 'dotenv/config';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 
 import './home.scss';
+import { use } from '@rails/webpacker/package/rules/babel';
 
 class Home extends React.Component {
   state = {
@@ -29,6 +30,7 @@ class Home extends React.Component {
     raceFilter: '',
     classFilter: '',
     factionFilter: '',
+    isUseable: false,
   }
 
   componentDidMount() {
@@ -113,6 +115,7 @@ class Home extends React.Component {
       })
   }
 
+  // This function is to split the mounts into two lists, collected and uncollected
   mountListSplit = () => {
     const { characterData, mounts } = this.state;
     const characterMounts = characterData.mounts.map(mount => mount.id);
@@ -181,6 +184,8 @@ class Home extends React.Component {
     })
   }
 
+  // This function is to switch the realm list based on the user's region
+  // The default is blank so there is no realm list until the user selects a region
   realmSwitch = () => {
     const { realms, userRegion } = this.state;
 
@@ -224,48 +229,83 @@ class Home extends React.Component {
   }
 
   mountSwitch = () => {
-    const { mounts, collectedMounts, uncollectedMounts, listChoice} = this.state;
+    const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, raceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
+    const subMountDisplay = [];
 
+    // I combined both the filter and list switch into one function since I wanted to reduce setState calls
+    // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
+
+    // If no listChoice is selected, default to all
+    // If listChoice is selected, filter mounts based on listChoice
     switch(listChoice) {
       case 'all':
-        this.setState({
-          mountDisplay: mounts,
-        })
+        subMountDisplay = mounts;
         break;
       case 'collected':
-        this.setState({
-          mountDisplay: collectedMounts,
-        })
+        subMountDisplay = collectedMounts;
         break;
       case 'uncollected':
-        this.setState({
-          mountDisplay: uncollectedMounts,
-        })
+        subMountDisplay = uncollectedMounts;
         break;
       default:
-        this.setState({
-          mountDisplay: mounts,
-        })
+        subMountDisplay = mounts;
     }
-  }
 
-  mountFilter = () => {
-    const { mountDisplay, sourceFilter, raceFilter, classFilter, factionFilter } = this.state;
+    // If isUseable is true, filter mounts based on characterData
+    if (isUseable) {
+      const useableMounts = subMountDisplay.filter(mount => {
+        let raceCondition = true;
+        let classCondition = true;
+        let factionCondition = true;
 
+        if ('requirements' in mount.mount_detail) {
+          if ('races' in mount.mount_detail.requirements) {
+            raceCondition = mount.mount_detail.requirements.races === characterData.race
+          } else {
+            raceCondition = false;
+          }
+          
+          if ('classes' in mount.mount_detail.requirements) {
+            classCondition = mount.mount_detail.requirements.classes === characterData.character_class
+          } else {
+            classCondition = false;
+          }
+
+          if ('faction' in mount.mount_detail.requirements) {
+            factionCondition = mount.mount_detail.requirements.faction === characterData.faction
+          } else {
+            factionCondition = false;
+          }
+        }
+
+        return raceCondition && classCondition && factionCondition;
+      });
+
+      subMountDisplay = useableMounts;
+    }
+
+    // If no filters are selected, display mounts based on switch and isUseable
     if (sourceFilter === '' && raceFilter === '' && classFilter === '' && factionFilter === '') {
-      return mountDisplay;
+      this.setState({
+        mountDisplay: subMountDisplay,
+      })
+      return;
     }
   
-    const filteredMounts = mountDisplay.filter(mount => {
+    // If filters are selected, filter mounts based on filters
+    const filteredMounts = subMountDisplay.filter(mount => {
       let sourceCondition = true;
       let raceCondition = true;
       let classCondition = true;
       let factionCondition = true;
   
+      // Every mount has a source, so no need to check if source exists
       if (sourceFilter !== '') {
         sourceCondition = mount.mount_detail.source === sourceFilter;
       }
   
+      // Not all mounts have requirements, so check if requirments exists
+      // There are three possible keys under requirements, so check if each key exists then filter if they exist
       if (raceFilter !== '') {
         if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
           raceCondition = mount.mount_detail.requirements.races === raceFilter;
@@ -302,11 +342,18 @@ class Home extends React.Component {
         }
       }
   
+      // Since some mounts can have multiple requirements, the mount must fulfill them all or it will not be displayed
       return sourceCondition && raceCondition && classCondition && factionCondition;
     });
-  
-    console.log(filteredMounts);
-  };
+
+    subMountDisplay = filteredMounts;
+
+    this.setState({
+      mountDisplay: subMountDisplay,
+    })
+    
+    return;
+  }
 
   render() {
     const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source } = this.state;
@@ -414,6 +461,10 @@ class Home extends React.Component {
                   )
                 })}
               </select>
+            </div>
+            <div className="col">
+              <input type="checkbox" id="useable" name="useable" value="useable" onChange={() => this.setState({isUseable: !this.state.isUseable})} />
+              <label htmlFor="useable">Is Usable?</label>
             </div>
             <button className="col" onClick={this.mountFilter}>Filter</button>
           </div>
