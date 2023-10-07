@@ -5,6 +5,7 @@ import 'dotenv/config';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 
 import './home.scss';
+import { Dropdown } from 'bootstrap';
 
 class Home extends React.Component {
   state = {
@@ -30,6 +31,12 @@ class Home extends React.Component {
     classFilter: '',
     factionFilter: '',
     isUseable: false,
+    userRoster: [],
+    username: '',
+    password: '',
+    email: '',
+    error: '',
+    loggedIn: false,
   }
 
   componentDidMount() {
@@ -367,8 +374,146 @@ class Home extends React.Component {
     return;
   }
 
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  login = (e) => {
+    const { username, password } = this.state;
+    e.preventDefault();
+
+    fetch('/api/sessions', safeCredentials({
+      method: 'POST',
+      body: JSON.stringify({
+        user: {
+          username,
+          password,
+        }
+      })
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: response.characters,
+            loggedIn: true,
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error logging in',
+        })
+      })
+  }
+
+  signup = (e) => {
+    const { username, password, email } = this.state;
+    e.preventDefault();
+
+    fetch('/api/users', safeCredentials({
+      method: 'POST',
+      body: JSON.stringify({
+        user: {
+          username,
+          password,
+          email,
+        }
+      })
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.login();
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error signing up',
+        })
+      })
+  }
+
+  authenicate = () => {
+    fetch('/api/sessions/authenticate', safeCredentials({
+      method: 'GET',
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: response.characters,
+            loggedIn: true,
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error authenticating',
+        })
+      })
+  }
+
+  endSession = () => {
+    fetch('/api/sessions/logout', safeCredentials({
+      method: 'DELETE',
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: [],
+            loggedIn: false,
+            username: '',
+            password: '',
+            email: '',
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error logging out',
+        })
+      })
+  }
+
+  addCharacter = () => {
+    const { userRegion, userRealm, userCharacter } = this.state;
+
+    fetch('/api/characters', safeCredentials({
+      method: 'POST',
+      body: JSON.stringify({
+        character: {
+          region: userRegion,
+          realm: userRealm,
+          name: userCharacter,
+        }
+      })
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: response.characters,
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error adding character',
+        })
+      })
+  }
+
   render() {
-    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable } = this.state;
+    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable, loggedIn, error, username, email, password, userRoster } = this.state;
     
     return (
       <div className="home">
@@ -377,23 +522,51 @@ class Home extends React.Component {
             <a className="navbar-brand" href="#">Mounter</a>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarNav">
-              <ul className="navbar-nav">
-                <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Features</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Pricing</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li>
-              </ul>
-            </div>
+            </button> 
+            {loggedIn ?  (
+              <div className="collapse navbar-collapse" id="navbarNav">
+                <ul className="navbar-nav">
+                  <li className="nav-item">
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Roster
+                      </button>
+                      <ul class="dropdown-menu">
+                        {userRoster.map(character => {
+                          return (
+                            <li><a class="dropdown-item" href="#" name={character.name} realm={character.realm} region={character.region}>{character.name}</a></li>
+                          )
+                        })}
+                      </ul>
+                    </div>
+                  </li>
+                  <li className="nav-item">
+                    <button className="btn btn-danger" onClick={this.endSession}>Logout</button>
+                  </li>
+                  {error && 
+                    <li className="nav-item"> 
+                      <p className="text-danger mt-2">{error}</p>
+                    </li>
+                  }
+                </ul>
+              </div>
+              ) : (
+              <div className="collapse navbar-collapse" id="navbarNav">            
+                <form onSubmit={this.login}>
+                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
+                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
+                  <button type="submit" className="btn btn-danger btn-block btn-lg">Log in</button>
+                  {error && <p className="text-danger mt-2">{error}</p>}
+                </form>
+                <form className="d-flex" onSubmit={this.signup}>
+                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
+                  <input name="email" type="text" className="form-control form-control-lg mb-3" placeholder="Email" value={email} onChange={this.handleChange} required />
+                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
+                  <button type="submit" className="btn btn-danger btn-block btn-lg">Sign up</button>
+                  {error && <p className="text-danger mt-2">{error}</p>}
+                </form>
+              </div>
+              )}         
           </div>
         </nav>
         <div className="container">
@@ -422,6 +595,7 @@ class Home extends React.Component {
             </select>
             <input className="col characterM" type="text" placeholder="Character Name" onChange={this.handleCharacterChange}/>
             <button className="col" onClick={this.getProfile}>Search</button>
+            <button className="col" onClick={this.addCharacter}>Add to Roster</button>
           </div>
           <div className="row">
             {searchError ?
