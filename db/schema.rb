@@ -10,11 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_13_214443) do
+ActiveRecord::Schema.define(version: 2023_10_07_195538) do
 
   create_table "calls", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "characters", force: :cascade do |t|
+    t.string "name"
+    t.string "region"
+    t.string "realm"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "rosters", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "character_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["character_id"], name: "index_rosters_on_character_id"
+    t.index ["user_id"], name: "index_rosters_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -32,4 +49,6 @@ ActiveRecord::Schema.define(version: 2023_09_13_214443) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "rosters", "characters"
+  add_foreign_key "rosters", "users"
 end
