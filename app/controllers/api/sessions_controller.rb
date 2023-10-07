@@ -10,7 +10,9 @@ module Api
           httponly: true,
         }
 
-        render 'api/sessions/create', status: :created
+        user_characters = @user.characters
+
+        render json: { success: true, characters: user_characters }, status: :created
       else
         render json: { success: false }, status: :bad_request
       end
