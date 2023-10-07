@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   namespace :api do
     resources :users, only: [:create]
     resources :sessions, only: [:create, :destroy]
-    resources :characters, only: [:create]
+    resources :characters, only: [:create, :destroy]
 
     get "/calls/realms/", to: "calls#realms"
     get "/calls/mounts", to: "calls#mounts"

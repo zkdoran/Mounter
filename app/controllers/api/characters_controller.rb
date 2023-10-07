@@ -17,14 +17,14 @@ module Api
           if existing_character
             # Associate the existing character with the current user
             current_user.characters << existing_character
-            render json: { success: true, message: "Character added successfully." }, status: :created
+            render json: { success: true, message: "Character added successfully.", characters: current_user.characters }, status: :created
           else
             @character = Character.new(character_params)
     
             if @character.save
               current_user.characters << @character
               # Handle successful creation
-              render json: { success: true, message: "Character added successfully." }, status: :created
+              render json: { success: true, message: "Character added successfully.", characters: current_user.characters }, status: :created
             else
               # Handle validation errors
               render json: { success: false, errors: @character.errors.full_messages }, status: :unprocessable_entity
@@ -35,6 +35,27 @@ module Api
         end
       else
         render json: { success: false, error: "You must be logged in to add a character." }, status: :unauthorized
+      end
+    end
+
+    def destroy
+      token = cookies.signed[:mounter_session_token]
+      session = Session.find_by(token: token)
+
+      if session
+        current_user = session.user
+
+        character = Character.find_by(id: params[:id])
+
+        if character
+          current_user.characters.delete(character)
+
+          render json: { success: true, message: "Character deleted successfully.", characters: current_user.characters }, status: :ok
+        else
+          render json: { success: false, error: "Character not found." }, status: :not_found
+        end
+      else
+        render json: { success: false, error: "You must be logged in to delete a character." }, status: :unauthorized
       end
     end
 
