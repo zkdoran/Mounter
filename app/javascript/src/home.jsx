@@ -39,6 +39,7 @@ class Home extends React.Component {
     this.getClasses();
   }
 
+  // This function is to get the realms for the realm list
   getRealms = () => {
     fetch('/api/calls/realms/')
       .then(handleErrors)
@@ -50,6 +51,7 @@ class Home extends React.Component {
       })
   }
 
+  // This function is to get the mounts for the mount list
   getMounts = () => {
     fetch('/api/calls/mounts')
       .then(handleErrors)
@@ -62,6 +64,7 @@ class Home extends React.Component {
       .then(() => this.mountSwitch())
   }
 
+  // This function is to get the playable races for the races list
   getRaces = () => {
     fetch('/api/calls/races')
       .then(handleErrors)
@@ -73,6 +76,7 @@ class Home extends React.Component {
       })
   }
 
+  // This function is to get the playable classes for the classes list
   getClasses = () => {
     fetch('/api/calls/classes')
       .then(handleErrors)
@@ -84,11 +88,14 @@ class Home extends React.Component {
       })
   }
 
+  // This function is to get the character's profile
   getProfile = () => {
+    // Reset searchError so it doesn't persist
     this.setState({
       searchError: '',
     })
 
+    // If any of the fields are blank, display an error
     if (this.state.userRegion === '' || this.state.userRealm === '' || this.state.userCharacter === '') {
       this.setState({
         searchError: 'Please fill out all fields',
@@ -114,7 +121,7 @@ class Home extends React.Component {
       })
   }
 
-  // This function is to split the mounts into two lists, collected and uncollected
+  // This function is to split the mounts into two additional lists: collected and uncollected
   mountListSplit = () => {
     const { characterData, mounts } = this.state;
     const characterMounts = characterData.mounts.map(mount => mount.id);
@@ -183,6 +190,13 @@ class Home extends React.Component {
     })
   }
 
+  handleIsUseableChange = (event) => {
+    const { checked } = event.target;
+    this.setState({ 
+      isUseable: checked 
+    });
+  };
+  
   // This function is to switch the realm list based on the user's region
   // The default is blank so there is no realm list until the user selects a region
   realmSwitch = () => {
@@ -224,15 +238,14 @@ class Home extends React.Component {
   listChoice = (e) => {
     this.setState({
       listChoice: e.target.value,
-    }, () => this.mountSwitch())
+    }, () => this.mountSwitch());
   }
 
+  // I combined both the filter and list switch into one function since I wanted to reduce setState calls
+  // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
   mountSwitch = () => {
     const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, raceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
-    const subMountDisplay = [];
-
-    // I combined both the filter and list switch into one function since I wanted to reduce setState calls
-    // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
+    let subMountDisplay = [];
 
     // If no listChoice is selected, default to all
     // If listChoice is selected, filter mounts based on listChoice
@@ -355,7 +368,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source } = this.state;
+    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable } = this.state;
     
     return (
       <div className="home">
@@ -462,10 +475,10 @@ class Home extends React.Component {
               </select>
             </div>
             <div className="col">
-              <input type="checkbox" id="useable" name="useable" value="useable" onChange={() => this.setState({isUseable: !this.state.isUseable})} />
-              <label htmlFor="useable">Is Usable?</label>
+              <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
+              <label className="useablecheck" htmlFor="useable">Is Usable?</label>
             </div>
-            <button className="col" onClick={this.mountFilter}>Filter</button>
+            <button className="col" onClick={this.mountSwitch}>Filter</button>
           </div>
           <div className="row mounts">
             <h1 className="source">Mounts</h1>
