@@ -18,6 +18,19 @@ module Api
       end
     end
 
+    def authenticate
+      token = cookies.signed[:mounter_session_token]
+      session = Session.find_by(token: token)
+
+      if session
+        user_characters = session.user.characters
+
+        render json: { success: true, characters: user_characters }, status: :ok
+      else
+        render json: { success: false }, status: :unauthorized
+      end
+    end
+
     def destroy
       token = cookies.signed[:mounter_session_token]
       session = Session.find_by(token: token)
