@@ -3,7 +3,7 @@ class CharacterExistenceChecker
     config.app_id = ENV['BLIZZARD_CLIENT_ID']
     config.app_secret = ENV['BLIZZARD_CLIENT_SECRET']
     config.region = 'us'
-    config.use_cache = true
+    config.use_cache = false
     config.redis_host = ENV['REDIS_HOST']
     config.redis_port = ENV['REDIS_PORT']
     config.cache_access_token = true
