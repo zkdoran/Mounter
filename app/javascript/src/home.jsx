@@ -62,7 +62,7 @@ class Home extends React.Component {
           mounts: data,
         })
       })
-      .then(() => this.mountSwitch())
+      .then(() => this.mountListMaker())
   }
 
   // This function is to get the playable races for the races list
@@ -145,69 +145,25 @@ class Home extends React.Component {
       uncollectedMounts: uncollectedMounts,
     });
   
-    this.mountSwitch();
+    this.mountListMaker();
   }
-  
-
-  handleRegionChange = (e) => {
-    this.setState({
-      userRegion: e.target.value,
-    }, () => this.realmSwitch())
-  }
-
-  handleRealmChange = (e) => {
-    this.setState({
-      userRealm: e.target.value,
-    })
-  }
-
-  handleCharacterChange = (e) => {
-    this.setState({
-      userCharacter: e.target.value,
-    })
-  }
-
-  handleSourceChange = (e) => {
-    this.setState({
-      sourceFilter: e.target.value,
-    })
-  }
-
-  handleRaceChange = (e) => {
-    this.setState({
-      raceFilter: e.target.value,
-    })
-  }
-
-  handleClassChange = (e) => {
-    this.setState({
-      classFilter: e.target.value,
-    })
-  }
-
-  handleFactionChange = (e) => {
-    this.setState({
-      factionFilter: e.target.value,
-    })
-  }
-
-  handleIsUseableChange = (event) => {
-    const { checked } = event.target;
-    this.setState({ 
-      isUseable: checked 
-    });
-  };
 
   handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  listChoice = (e) => {
-    this.setState({
-      listChoice: e.target.value,
-    }, () => this.mountSwitch());
+    const { name, value, type, checked } = e.target;
+  
+    if (type === 'checkbox') {
+      this.setState({
+        [name]: checked,
+      });
+    } else {
+      this.setState({
+        [name]: value,
+      });
+  
+      if (name === 'userRegion' || name === 'listChoice') {
+        this.mountListMaker();
+      }
+    }
   }
   
   // This function is to switch the realm list based on the user's region
@@ -219,38 +175,33 @@ class Home extends React.Component {
     const eu_realms = realms.eu;
     const kr_realms = realms.kr;
     const tw_realms = realms.tw;
+    let subRealmList = [];
 
     switch(userRegion) {
       case 'us':
-        this.setState({
-          realmList: us_realms,
-        })
+        subRealmList = us_realms;
         break;
       case 'eu':
-        this.setState({
-          realmList: eu_realms,
-        })
+        subRealmList = eu_realms;
         break;
       case 'kr':
-        this.setState({
-          realmList: kr_realms,
-        })
+        subRealmList = kr_realms;
         break;
       case 'tw':
-        this.setState({
-          realmList: tw_realms,
-        })
+        subRealmList = tw_realms;
         break;
       default:
-        this.setState({
-          realmList: [],
-        })
+        subRealmList;
     }
+
+    this.setState({
+      realmList: subRealmList,
+    })
   }
 
   // I combined both the filter and list switch into one function since I wanted to reduce setState calls
   // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
-  mountSwitch = () => {
+  mountListMaker = () => {
     const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, raceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
     let subMountDisplay = [];
 
@@ -404,7 +355,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable, loggedIn, error, username, email, password, userRoster } = this.state;
+    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable } = this.state;
     
     return (
       <div className="home">
@@ -417,23 +368,23 @@ class Home extends React.Component {
               </div>
             </div>
             <div className="row dropdowns">
-              <select className="col region" onChange={this.handleRegionChange}>
+              <select className="col region" onChange={this.handleChange}>
                 <option>Select a Region</option>
                 {region.map(region => {
                   return (
-                    <option key={region} value={region}>{region.toUpperCase()}</option>
+                    <option key={region} name="userRegion" value={region}>{region.toUpperCase()}</option>
                   )
                 })}
               </select>
-              <select className="col realm" onChange={this.handleRealmChange}>
+              <select className="col realm" onChange={this.handleChange}>
                 <option>Select a Realm</option>
                 {realmList.map(realm => {
                   return (
-                    <option key={realm.id} value={realm.slug}>{realm.name}</option>
+                    <option key={realm.id} name="userRealm" value={realm.slug}>{realm.name}</option>
                   )
                 })}
               </select>
-              <input className="col characterM" type="text" placeholder="Character Name" onChange={this.handleCharacterChange}/>
+              <input className="col characterM" type="text" placeholder="Character Name" name="userCharacter" onChange={this.handleChange}/>
               <button className="col" onClick={this.getProfile}>Search</button>
               <button className="col" onClick={this.addCharacter}>Add to Roster</button>
             </div>
@@ -447,43 +398,43 @@ class Home extends React.Component {
             </div>
             <div className="row filters">
               <div className="col">
-                <button className="btn btn-primary" onClick={this.listChoice} value="all">All</button>
-                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="collected">Collected</button>
-                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="uncollected">Not Collected</button>
+                <button className="btn btn-primary" onClick={this.listChoice} name="listChoice" value="all">All</button>
+                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="collected">Collected</button>
+                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="uncollected">Not Collected</button>
               </div>
               <div className="col">
-                <select className="col faction" onChange={this.handleFactionChange}>
+                <select className="col faction" onChange={this.handleChange}>
                   <option>Select a Faction</option>
-                  <option value="Alliance">Alliance</option>
-                  <option value="Horde">Horde</option>
+                  <option name="factionFilter" value="Alliance">Alliance</option>
+                  <option name="factionFilter" value="Horde">Horde</option>
                 </select>
               </div>
               <div className="col">
-                <select className="col source" onChange={this.handleSourceChange}>
+                <select className="col source" onChange={this.handleChange}>
                   <option>Select a Source</option>
                   {source.map(source => {
                     return (
-                      <option key={source} value={source}>{source}</option>
+                      <option key={source} name="sourceFilter" value={source}>{source}</option>
                     )
                   })}
                 </select>
               </div>
               <div className="col">
-                <select className="col races" onChange={this.handleRaceChange}>
+                <select className="col races" onChange={this.handleChange}>
                   <option>Select a Race</option>
                   {races.map(race => {
                     return (
-                      <option key={race.id} value={race.name}>{race.name}</option>
+                      <option key={race.id} name="raceFilter" value={race.name}>{race.name}</option>
                     )
                   })}
                 </select>
               </div>
               <div className="col">
-                <select className="col classes" onChange={this.handleClassChange}>
+                <select className="col classes" onChange={this.handleChange}>
                   <option>Select a Class</option>
                   {classes.map(playableClass => {
                     return (
-                      <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
+                      <option key={playableClass.id} name="classFilter" value={playableClass.name}>{playableClass.name}</option>
                     )
                   })}
                 </select>
@@ -492,7 +443,7 @@ class Home extends React.Component {
                 <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
                 <label className="useablecheck" htmlFor="useable">Is Usable?</label>
               </div>
-              <button className="col" onClick={this.mountSwitch}>Filter</button>
+              <button className="col" onClick={this.mountListMaker}>Filter</button>
             </div>
             <div className="row mounts">
               <h1 className="source">Mounts</h1>
