@@ -203,6 +203,18 @@ class Home extends React.Component {
       isUseable: checked 
     });
   };
+
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  listChoice = (e) => {
+    this.setState({
+      listChoice: e.target.value,
+    }, () => this.mountSwitch());
+  }
   
   // This function is to switch the realm list based on the user's region
   // The default is blank so there is no realm list until the user selects a region
@@ -240,12 +252,6 @@ class Home extends React.Component {
           realmList: [],
         })
     }
-  }
-
-  listChoice = (e) => {
-    this.setState({
-      listChoice: e.target.value,
-    }, () => this.mountSwitch());
   }
 
   // I combined both the filter and list switch into one function since I wanted to reduce setState calls
@@ -323,7 +329,7 @@ class Home extends React.Component {
         sourceCondition = mount.mount_detail.source === sourceFilter;
       }
   
-      // Not all mounts have requirements, so check if requirments exists
+      // Not all mounts have requirements, so check if requirements exists
       // There are three possible keys under requirements, so check if each key exists then filter if they exist
       if (raceFilter !== '') {
         if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
@@ -372,12 +378,6 @@ class Home extends React.Component {
     })
     
     return;
-  }
-
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    })
   }
 
   login = (e) => {
