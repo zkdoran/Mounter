@@ -148,6 +148,7 @@ class Home extends React.Component {
     this.mountListMaker();
   }
 
+  // Combined handleChange for checkboxes and inputs
   handleChange = (e) => {
     const { name, value, type, checked } = e.target;
   
@@ -158,11 +159,15 @@ class Home extends React.Component {
     } else {
       this.setState({
         [name]: value,
-      });
-  
-      if (name === 'userRegion' || name === 'listChoice') {
-        this.mountListMaker();
-      }
+      }); 
+    }
+    
+    if (name === 'userRegion') {
+      this.realmSwitch();
+    }
+
+    if (name === 'listChoice') {
+      this.mountListMaker();
     }
   }
   
