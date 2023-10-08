@@ -29,7 +29,6 @@ class Home extends React.Component {
     fetch('/api/calls/realms/')
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           realms: data,
         })
@@ -54,7 +53,6 @@ class Home extends React.Component {
     fetch(`/api/calls/profile/${this.state.userRegion}/${this.state.userRealm}/${this.state.userCharacter}`)
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           characterData: data,
           buttonDisabled: false,
