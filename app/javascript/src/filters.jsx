@@ -33,7 +33,6 @@ class Filters extends Component {
     fetch('/api/calls/mounts')
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           mounts: data,
         })
@@ -48,7 +47,6 @@ class Filters extends Component {
     fetch('/api/calls/races')
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           races: data,
         })
@@ -60,7 +58,6 @@ class Filters extends Component {
     fetch('/api/calls/classes')
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           classes: data,
         })
