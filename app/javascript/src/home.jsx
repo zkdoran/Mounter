@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
+import Layout from '@src/layout';
 
 import './home.scss';
-import { Dropdown } from 'bootstrap';
 
 class Home extends React.Component {
   state = {
@@ -31,12 +31,6 @@ class Home extends React.Component {
     classFilter: '',
     factionFilter: '',
     isUseable: false,
-    userRoster: [],
-    username: '',
-    password: '',
-    email: '',
-    error: '',
-    loggedIn: false,
   }
 
   componentDidMount() {
@@ -380,109 +374,6 @@ class Home extends React.Component {
     return;
   }
 
-  login = (e) => {
-    const { username, password } = this.state;
-    e.preventDefault();
-
-    fetch('/api/sessions', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        user: {
-          username,
-          password,
-        }
-      })
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: response.characters,
-            loggedIn: true,
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error logging in',
-        })
-      })
-  }
-
-  signup = (e) => {
-    const { username, password, email } = this.state;
-    e.preventDefault();
-
-    fetch('/api/users', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        user: {
-          username,
-          password,
-          email,
-        }
-      })
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.login();
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error signing up',
-        })
-      })
-  }
-
-  authenicate = () => {
-    fetch('/api/sessions/authenticate', safeCredentials({
-      method: 'GET',
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: response.characters,
-            loggedIn: true,
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error authenticating',
-        })
-      })
-  }
-
-  endSession = () => {
-    fetch('/api/sessions/logout', safeCredentials({
-      method: 'DELETE',
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: [],
-            loggedIn: false,
-            username: '',
-            password: '',
-            email: '',
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error logging out',
-        })
-      })
-  }
-
   addCharacter = () => {
     const { userRegion, userRealm, userCharacter } = this.state;
 
@@ -517,177 +408,118 @@ class Home extends React.Component {
     
     return (
       <div className="home">
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-          <div className="container-fluid">
-            <a className="navbar-brand" href="#">Mounter</a>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
-            </button> 
-            {loggedIn ?  (
-              <div className="collapse navbar-collapse" id="navbarNav">
-                <ul className="navbar-nav">
-                  <li className="nav-item">
-                    <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Roster
-                      </button>
-                      <ul class="dropdown-menu">
-                        {userRoster.map(character => {
-                          return (
-                            <li><a class="dropdown-item" href="#" name={character.name} realm={character.realm} region={character.region}>{character.name}</a></li>
-                          )
-                        })}
-                      </ul>
-                    </div>
-                  </li>
-                  <li className="nav-item">
-                    <button className="btn btn-danger" onClick={this.endSession}>Logout</button>
-                  </li>
-                  {error && 
-                    <li className="nav-item"> 
-                      <p className="text-danger mt-2">{error}</p>
-                    </li>
-                  }
-                </ul>
-              </div>
-              ) : (
-              <div className="collapse navbar-collapse" id="navbarNav">            
-                <form onSubmit={this.login}>
-                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="btn btn-danger btn-block btn-lg">Log in</button>
-                  {error && <p className="text-danger mt-2">{error}</p>}
-                </form>
-                <form className="d-flex" onSubmit={this.signup}>
-                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="email" type="text" className="form-control form-control-lg mb-3" placeholder="Email" value={email} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="btn btn-danger btn-block btn-lg">Sign up</button>
-                  {error && <p className="text-danger mt-2">{error}</p>}
-                </form>
-              </div>
-              )}         
-          </div>
-        </nav>
-        <div className="container">
-          <div className="row">
-            <div className="col text-center banner py-5">
-              <h1>Mounter</h1>
-              <p>Mounter is a web application that allows you to track your mounts in World of Warcraft.</p>
-            </div>
-          </div>
-          <div className="row dropdowns">
-            <select className="col region" onChange={this.handleRegionChange}>
-              <option>Select a Region</option>
-              {region.map(region => {
-                return (
-                  <option key={region} value={region}>{region.toUpperCase()}</option>
-                )
-              })}
-            </select>
-            <select className="col realm" onChange={this.handleRealmChange}>
-              <option>Select a Realm</option>
-              {realmList.map(realm => {
-                return (
-                  <option key={realm.id} value={realm.slug}>{realm.name}</option>
-                )
-              })}
-            </select>
-            <input className="col characterM" type="text" placeholder="Character Name" onChange={this.handleCharacterChange}/>
-            <button className="col" onClick={this.getProfile}>Search</button>
-            <button className="col" onClick={this.addCharacter}>Add to Roster</button>
-          </div>
-          <div className="row">
-            {searchError ?
-              <div className="alert alert-danger" role="alert">
-                {searchError}
-              </div>
-              : <br />
-            }
-          </div>
-          <div className="row filters">
-            <div className="col">
-              <button className="btn btn-primary" onClick={this.listChoice} value="all">All</button>
-              <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="collected">Collected</button>
-              <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="uncollected">Not Collected</button>
-            </div>
-            <div className="col">
-              <select className="col faction" onChange={this.handleFactionChange}>
-                <option>Select a Faction</option>
-                <option value="Alliance">Alliance</option>
-                <option value="Horde">Horde</option>
-              </select>
-            </div>
-            <div className="col">
-              <select className="col source" onChange={this.handleSourceChange}>
-                <option>Select a Source</option>
-                {source.map(source => {
-                  return (
-                    <option key={source} value={source}>{source}</option>
-                  )
-                })}
-              </select>
-            </div>
-            <div className="col">
-              <select className="col races" onChange={this.handleRaceChange}>
-                <option>Select a Race</option>
-                {races.map(race => {
-                  return (
-                    <option key={race.id} value={race.name}>{race.name}</option>
-                  )
-                })}
-              </select>
-            </div>
-            <div className="col">
-              <select className="col classes" onChange={this.handleClassChange}>
-                <option>Select a Class</option>
-                {classes.map(playableClass => {
-                  return (
-                    <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
-                  )
-                })}
-              </select>
-            </div>
-            <div className="col">
-              <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
-              <label className="useablecheck" htmlFor="useable">Is Usable?</label>
-            </div>
-            <button className="col" onClick={this.mountSwitch}>Filter</button>
-          </div>
-          <div className="row mounts">
-            <h1 className="source">Mounts</h1>
-            {mountDisplay.map(mount => {
-                  if (mount.mount_detail.should_exclude_if_uncollected) {
-                    return null;
-                  }
-
-                  return (
-                    <div key={mount.id} className="col mb-3">                           
-                      <div className="card" style={{width: 14 + 'rem'}}>
-                        <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
-                          e.target.src = myImg
-                          e.target.alt = 'No Image Found'
-                        }} />
-                        <div className="card-body">
-                          <h5 className="card-title">{mount.name}</h5>
-                          {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source}</p> : <p className="card-text">Source: Unknown</p>}
-                          <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}          
-          </div>
-        </div>
-        <footer className="p-3 bg-light">
+        <Layout>
           <div className="container">
             <div className="row">
-              <div className="col text-center">
-                <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
+              <div className="col text-center banner py-5">
+                <h1>Mounter</h1>
+                <p>Mounter is a web application that allows you to track your mounts in World of Warcraft.</p>
               </div>
             </div>
+            <div className="row dropdowns">
+              <select className="col region" onChange={this.handleRegionChange}>
+                <option>Select a Region</option>
+                {region.map(region => {
+                  return (
+                    <option key={region} value={region}>{region.toUpperCase()}</option>
+                  )
+                })}
+              </select>
+              <select className="col realm" onChange={this.handleRealmChange}>
+                <option>Select a Realm</option>
+                {realmList.map(realm => {
+                  return (
+                    <option key={realm.id} value={realm.slug}>{realm.name}</option>
+                  )
+                })}
+              </select>
+              <input className="col characterM" type="text" placeholder="Character Name" onChange={this.handleCharacterChange}/>
+              <button className="col" onClick={this.getProfile}>Search</button>
+              <button className="col" onClick={this.addCharacter}>Add to Roster</button>
+            </div>
+            <div className="row">
+              {searchError ?
+                <div className="alert alert-danger" role="alert">
+                  {searchError}
+                </div>
+                : <br />
+              }
+            </div>
+            <div className="row filters">
+              <div className="col">
+                <button className="btn btn-primary" onClick={this.listChoice} value="all">All</button>
+                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="collected">Collected</button>
+                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.listChoice} value="uncollected">Not Collected</button>
+              </div>
+              <div className="col">
+                <select className="col faction" onChange={this.handleFactionChange}>
+                  <option>Select a Faction</option>
+                  <option value="Alliance">Alliance</option>
+                  <option value="Horde">Horde</option>
+                </select>
+              </div>
+              <div className="col">
+                <select className="col source" onChange={this.handleSourceChange}>
+                  <option>Select a Source</option>
+                  {source.map(source => {
+                    return (
+                      <option key={source} value={source}>{source}</option>
+                    )
+                  })}
+                </select>
+              </div>
+              <div className="col">
+                <select className="col races" onChange={this.handleRaceChange}>
+                  <option>Select a Race</option>
+                  {races.map(race => {
+                    return (
+                      <option key={race.id} value={race.name}>{race.name}</option>
+                    )
+                  })}
+                </select>
+              </div>
+              <div className="col">
+                <select className="col classes" onChange={this.handleClassChange}>
+                  <option>Select a Class</option>
+                  {classes.map(playableClass => {
+                    return (
+                      <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
+                    )
+                  })}
+                </select>
+              </div>
+              <div className="col">
+                <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
+                <label className="useablecheck" htmlFor="useable">Is Usable?</label>
+              </div>
+              <button className="col" onClick={this.mountSwitch}>Filter</button>
+            </div>
+            <div className="row mounts">
+              <h1 className="source">Mounts</h1>
+              {mountDisplay.map(mount => {
+                    if (mount.mount_detail.should_exclude_if_uncollected) {
+                      return null;
+                    }
+
+                    return (
+                      <div key={mount.id} className="col mb-3">                           
+                        <div className="card" style={{width: 14 + 'rem'}}>
+                          <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
+                            e.target.src = myImg
+                            e.target.alt = 'No Image Found'
+                          }} />
+                          <div className="card-body">
+                            <h5 className="card-title">{mount.name}</h5>
+                            {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source}</p> : <p className="card-text">Source: Unknown</p>}
+                            <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}          
+            </div>
           </div>
-        </footer>
+        </Layout>
       </div>
     )
   }
