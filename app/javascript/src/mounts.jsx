@@ -38,3 +38,5 @@ class Mounts extends Component {
     )
   }
 }
+
+export default Mounts;
