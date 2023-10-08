@@ -4,6 +4,7 @@ import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 import Layout from '@src/layout';
+import Filters from '@src/filters';
 
 import './home.scss';
 
@@ -15,22 +16,13 @@ class Home extends React.Component {
     races: [],
     classes: [],
     characterData: {},
-    collectedMounts: [],
-    uncollectedMounts: [],
     buttonDisabled: true,
     realmList: [],
     userRegion: '',
     userRealm: '',
     userCharacter: '',
     source: ['Achievement', 'Discovery', 'Drop', 'In-Game Shop', 'Profession', 'Promotion', 'Quest', 'Trading Card Game', 'Vendor', 'World Event'],
-    searchError: '',
-    listChoice: '',
-    mountDisplay: [],
-    sourceFilter: '',
-    raceFilter: '',
-    classFilter: '',
-    factionFilter: '',
-    isUseable: false,
+    profileError: '',
   }
 
   componentDidMount() {
@@ -91,15 +83,15 @@ class Home extends React.Component {
 
   // This function is to get the character's profile
   getProfile = () => {
-    // Reset searchError so it doesn't persist
+    // Reset profileError so it doesn't persist
     this.setState({
-      searchError: '',
+      profileError: '',
     })
 
     // If any of the fields are blank, display an error
     if (this.state.userRegion === '' || this.state.userRealm === '' || this.state.userCharacter === '') {
       this.setState({
-        searchError: 'Please fill out all fields',
+        profileError: 'Please fill out all fields',
       })
       return;
     }
@@ -117,57 +109,51 @@ class Home extends React.Component {
       .catch(error => {
         console.log(error)
         this.setState({
-          searchError: 'Character not found',
+          profileError: 'Character not found',
         })
       })
   }
 
-  // This function is to split the mounts into two additional lists: collected and uncollected
-  mountListSplit = () => {
-    const { characterData, mounts } = this.state;
-    const characterMounts = characterData.mounts.map(mount => mount.id);
-  
-    const collectedMounts = mounts.filter(mount => characterMounts.includes(mount.id));
-  
-    // Update should_exclude_if_uncollected to false for collected mounts
-    const updatedCollectedMounts = collectedMounts.map(mount => ({
-      ...mount,
-      mount_detail: {
-        ...mount.mount_detail,
-        should_exclude_if_uncollected: false,
-      },
-    }));
-  
-    const uncollectedMounts = mounts.filter(mount => !characterMounts.includes(mount.id));
-  
-    this.setState({
-      collectedMounts: updatedCollectedMounts,
-      uncollectedMounts: uncollectedMounts,
-    });
-  
-    this.mountListMaker();
+  // Add a character to the user's roster
+  addCharacter = () => {
+    const { userRegion, userRealm, userCharacter } = this.state;
+
+    fetch('/api/characters', safeCredentials({
+      method: 'POST',
+      body: JSON.stringify({
+        character: {
+          region: userRegion,
+          realm: userRealm,
+          name: userCharacter,
+        }
+      })
+    }))
+      .then(handleErrors)
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: response.characters,
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({
+          error: 'Error adding character',
+        })
+      })
   }
 
-  // Combined handleChange for checkboxes and inputs
+  // Combined handleChange for inputs
   handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
+     
+    this.setState({
+      [name]: value,
+    }); 
   
-    if (type === 'checkbox') {
-      this.setState({
-        [name]: checked,
-      });
-    } else {
-      this.setState({
-        [name]: value,
-      }); 
-    }
-    
     if (name === 'userRegion') {
       this.realmSwitch();
-    }
-
-    if (name === 'listChoice') {
-      this.mountListMaker();
     }
   }
   
@@ -204,163 +190,8 @@ class Home extends React.Component {
     })
   }
 
-  // I combined both the filter and list switch into one function since I wanted to reduce setState calls
-  // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
-  mountListMaker = () => {
-    const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, raceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
-    let subMountDisplay = [];
-
-    // If no listChoice is selected, default to all
-    // If listChoice is selected, filter mounts based on listChoice
-    switch(listChoice) {
-      case 'all':
-        subMountDisplay = mounts;
-        break;
-      case 'collected':
-        subMountDisplay = collectedMounts;
-        break;
-      case 'uncollected':
-        subMountDisplay = uncollectedMounts;
-        break;
-      default:
-        subMountDisplay = mounts;
-    }
-
-    // If isUseable is true, filter mounts based on characterData
-    if (isUseable) {
-      const useableMounts = subMountDisplay.filter(mount => {
-        let raceCondition = true;
-        let classCondition = true;
-        let factionCondition = true;
-
-        if ('requirements' in mount.mount_detail) {
-          if ('races' in mount.mount_detail.requirements) {
-            raceCondition = mount.mount_detail.requirements.races === characterData.race
-          } else {
-            raceCondition = false;
-          }
-          
-          if ('classes' in mount.mount_detail.requirements) {
-            classCondition = mount.mount_detail.requirements.classes === characterData.character_class
-          } else {
-            classCondition = false;
-          }
-
-          if ('faction' in mount.mount_detail.requirements) {
-            factionCondition = mount.mount_detail.requirements.faction === characterData.faction
-          } else {
-            factionCondition = false;
-          }
-        }
-
-        return raceCondition && classCondition && factionCondition;
-      });
-
-      subMountDisplay = useableMounts;
-    }
-
-    // If no filters are selected, display mounts based on switch and isUseable
-    if (sourceFilter === '' && raceFilter === '' && classFilter === '' && factionFilter === '') {
-      this.setState({
-        mountDisplay: subMountDisplay,
-      })
-      return;
-    }
-  
-    // If filters are selected, filter mounts based on filters
-    const filteredMounts = subMountDisplay.filter(mount => {
-      let sourceCondition = true;
-      let raceCondition = true;
-      let classCondition = true;
-      let factionCondition = true;
-  
-      // Every mount has a source, so no need to check if source exists
-      if (sourceFilter !== '') {
-        sourceCondition = mount.mount_detail.source === sourceFilter;
-      }
-  
-      // Not all mounts have requirements, so check if requirements exists
-      // There are three possible keys under requirements, so check if each key exists then filter if they exist
-      if (raceFilter !== '') {
-        if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
-          raceCondition = mount.mount_detail.requirements.races === raceFilter;
-        } else {
-          raceCondition = false;
-        }
-      } else {
-        if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
-          raceCondition = false;
-        }
-      }
-  
-      if (classFilter !== '') {
-        if ('requirements' in mount.mount_detail && 'classes' in mount.mount_detail.requirements) {
-          classCondition = mount.mount_detail.requirements.classes === classFilter;
-        } else {
-          classCondition = false;
-        }
-      } else {
-        if ('requirements' in mount.mount_detail && 'classes' in mount.mount_detail.requirements) {
-          classCondition = false;
-        }
-      }
-
-      if (factionFilter !== '') {
-        if ('requirements' in mount.mount_detail && 'faction' in mount.mount_detail.requirements) {
-          factionCondition = mount.mount_detail.requirements.faction === factionFilter;
-        } else {
-          factionCondition = false;
-        }
-      } else {
-        if ('requirements' in mount.mount_detail && 'faction' in mount.mount_detail.requirements) {
-          factionCondition = false;
-        }
-      }
-  
-      // Since some mounts can have multiple requirements, the mount must fulfill them all or it will not be displayed
-      return sourceCondition && raceCondition && classCondition && factionCondition;
-    });
-
-    subMountDisplay = filteredMounts;
-
-    this.setState({
-      mountDisplay: subMountDisplay,
-    })
-    
-    return;
-  }
-
-  addCharacter = () => {
-    const { userRegion, userRealm, userCharacter } = this.state;
-
-    fetch('/api/characters', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        character: {
-          region: userRegion,
-          realm: userRealm,
-          name: userCharacter,
-        }
-      })
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: response.characters,
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error adding character',
-        })
-      })
-  }
-
   render() {
-    const { region, races, classes, mountDisplay, buttonDisabled, realmList, searchError, source, isUseable } = this.state;
+    const { region, mounts, characterData, realmList, profileError } = this.state;
     
     return (
       <div className="home">
@@ -394,86 +225,14 @@ class Home extends React.Component {
               <button className="col" onClick={this.addCharacter}>Add to Roster</button>
             </div>
             <div className="row">
-              {searchError ?
+              {profileError ?
                 <div className="alert alert-danger" role="alert">
-                  {searchError}
+                  {profileError}
                 </div>
                 : <br />
               }
             </div>
-            <div className="row filters">
-              <div className="col">
-                <button className="btn btn-primary" onClick={this.listChoice} name="listChoice" value="all">All</button>
-                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="collected">Collected</button>
-                <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="uncollected">Not Collected</button>
-              </div>
-              <div className="col">
-                <select className="col faction" onChange={this.handleChange}>
-                  <option>Select a Faction</option>
-                  <option name="factionFilter" value="Alliance">Alliance</option>
-                  <option name="factionFilter" value="Horde">Horde</option>
-                </select>
-              </div>
-              <div className="col">
-                <select className="col source" onChange={this.handleChange}>
-                  <option>Select a Source</option>
-                  {source.map(source => {
-                    return (
-                      <option key={source} name="sourceFilter" value={source}>{source}</option>
-                    )
-                  })}
-                </select>
-              </div>
-              <div className="col">
-                <select className="col races" onChange={this.handleChange}>
-                  <option>Select a Race</option>
-                  {races.map(race => {
-                    return (
-                      <option key={race.id} name="raceFilter" value={race.name}>{race.name}</option>
-                    )
-                  })}
-                </select>
-              </div>
-              <div className="col">
-                <select className="col classes" onChange={this.handleChange}>
-                  <option>Select a Class</option>
-                  {classes.map(playableClass => {
-                    return (
-                      <option key={playableClass.id} name="classFilter" value={playableClass.name}>{playableClass.name}</option>
-                    )
-                  })}
-                </select>
-              </div>
-              <div className="col">
-                <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
-                <label className="useablecheck" htmlFor="useable">Is Usable?</label>
-              </div>
-              <button className="col" onClick={this.mountListMaker}>Filter</button>
-            </div>
-            <div className="row mounts">
-              <h1 className="source">Mounts</h1>
-              {mountDisplay.map(mount => {
-                    if (mount.mount_detail.should_exclude_if_uncollected) {
-                      return null;
-                    }
-
-                    return (
-                      <div key={mount.id} className="col mb-3">                           
-                        <div className="card" style={{width: 14 + 'rem'}}>
-                          <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="card-img-top" alt="Oooo Pretty" onError={(e) => {
-                            e.target.src = myImg
-                            e.target.alt = 'No Image Found'
-                          }} />
-                          <div className="card-body">
-                            <h5 className="card-title">{mount.name}</h5>
-                            {mount.mount_detail.source ? <p className="card-text">Source: {mount.mount_detail.source}</p> : <p className="card-text">Source: Unknown</p>}
-                            <a href={`https://www.wowhead.com/mount/${mount.id}`} target="_blank">Wowhead</a>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}          
-            </div>
+            <Filters mounts={mounts} characterData={characterData} />
           </div>
         </Layout>
       </div>
