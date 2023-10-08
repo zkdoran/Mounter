@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
-import myImg from '../../assets/images/no-image-icon-23500.jpg';
 import Layout from '@src/layout';
 import Filters from '@src/filters';
 
@@ -12,24 +11,17 @@ class Home extends React.Component {
   state = {
     realms: {},
     region: ['us', 'eu', 'kr', 'tw'],
-    mounts: [],
-    races: [],
-    classes: [],
     characterData: {},
     buttonDisabled: true,
     realmList: [],
     userRegion: '',
     userRealm: '',
     userCharacter: '',
-    source: ['Achievement', 'Discovery', 'Drop', 'In-Game Shop', 'Profession', 'Promotion', 'Quest', 'Trading Card Game', 'Vendor', 'World Event'],
     profileError: '',
   }
 
   componentDidMount() {
     this.getRealms();
-    this.getMounts();
-    this.getRaces();
-    this.getClasses();
   }
 
   // This function is to get the realms for the realm list
@@ -40,43 +32,6 @@ class Home extends React.Component {
         console.log(data)
         this.setState({
           realms: data,
-        })
-      })
-  }
-
-  // This function is to get the mounts for the mount list
-  getMounts = () => {
-    fetch('/api/calls/mounts')
-      .then(handleErrors)
-      .then(data => {
-        console.log(data)
-        this.setState({
-          mounts: data,
-        })
-      })
-      .then(() => this.mountListMaker())
-  }
-
-  // This function is to get the playable races for the races list
-  getRaces = () => {
-    fetch('/api/calls/races')
-      .then(handleErrors)
-      .then(data => {
-        console.log(data)
-        this.setState({
-          races: data,
-        })
-      })
-  }
-
-  // This function is to get the playable classes for the classes list
-  getClasses = () => {
-    fetch('/api/calls/classes')
-      .then(handleErrors)
-      .then(data => {
-        console.log(data)
-        this.setState({
-          classes: data,
         })
       })
   }
@@ -191,7 +146,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, mounts, characterData, realmList, profileError } = this.state;
+    const { region, characterData, realmList, profileError } = this.state;
     
     return (
       <div className="home">
@@ -232,7 +187,7 @@ class Home extends React.Component {
                 : <br />
               }
             </div>
-            <Filters mounts={mounts} characterData={characterData} />
+            <Filters characterData={characterData} />
           </div>
         </Layout>
       </div>

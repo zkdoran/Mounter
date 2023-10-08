@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import Mounts from '@src/mounts';
+import { handleErrors } from '@utils/fetchHelper';
 
 
 class Filters extends Component {
   state = {
-    mounts: this.props.mounts,
+    mounts: [],
+    classes: [],
+    races: [],
     characterData: this.props.characterData,
     listChoice: '',
     factionFilter: '',
@@ -16,10 +19,52 @@ class Filters extends Component {
     mountDisplay: [],
     collectedMounts: [],
     uncollectedMounts: [],
+    source: ['Achievement', 'Discovery', 'Drop', 'In-Game Shop', 'Profession', 'Promotion', 'Quest', 'Trading Card Game', 'Vendor', 'World Event'],
   }
 
   componentDidMount() {
-    this.mountListSplit();
+    this.getMounts();
+    this.getRaces();
+    this.getClasses();
+  }
+
+  // This function is to get the mounts for the mount list
+  getMounts = () => {
+    fetch('/api/calls/mounts')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          mounts: data,
+        })
+      })
+      .then(() => {
+        this.mountListMaker()
+      })
+  }
+
+  // This function is to get the playable races for the races list
+  getRaces = () => {
+    fetch('/api/calls/races')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          races: data,
+        })
+      })
+  }
+
+  // This function is to get the playable classes for the classes list
+  getClasses = () => {
+    fetch('/api/calls/classes')
+      .then(handleErrors)
+      .then(data => {
+        console.log(data)
+        this.setState({
+          classes: data,
+        })
+      })
   }
 
   // Combined handleChange for checkboxes and inputs
