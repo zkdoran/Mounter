@@ -11,6 +11,7 @@ class Mounts extends Component {
         <div className="row mounts">
           <h1 className="source">Mounts</h1>
           {mountDisplay.map(mount => {
+                // Some mounts are no longer collectible, so exclude them from the list
                 if (mount.mount_detail.should_exclude_if_uncollected) {
                   return null;
                 }
