@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
+import myImg from '../../assets/images/no-image-icon-23500.jpg';
 
 class Mounts extends Component {
-  state = {
-    mountDisplay: this.props.mountDisplay,
-    }
 
   render () {
-    const { mountDisplay } = this.state;
+    const { mountDisplay } = this.props;
 
     return (
       <React.Fragment>
