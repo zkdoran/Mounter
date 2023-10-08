@@ -1,5 +1,6 @@
 module Api
   class CallsController < ApplicationController
+    # Configure Blizzard API
     BlizzardApi.configure do |config|
       config.app_id = ENV['BLIZZARD_CLIENT_ID']
       config.app_secret = ENV['BLIZZARD_CLIENT_SECRET']
@@ -10,7 +11,10 @@ module Api
       config.cache_access_token = true
     end
 
-    def realms     
+    # Call all realms from Blizzard API, format data, and return as JSON
+    def realms 
+      # If using a parameter you have to do a two step process to get the index instead of just calling BlizzardApi::Wow::Realm.new.index
+      # US realms could be called using BlizzardApi::Wow::Realm.new.index since it's the default, but I'm using the two step process for consistency    
       us = BlizzardApi::Wow::Realm.new region: 'us'
       us_data = us.index
       format_realm(us_data)
@@ -37,6 +41,7 @@ module Api
       render json: realm_data , status: :ok
     end
 
+    # Call races from Blizzard API, format data, and return as JSON
     def races
       race_data = BlizzardApi::Wow::PlayableRace.new.index
 
@@ -45,6 +50,7 @@ module Api
       render json: race_data[:races], status: :ok
     end
 
+    # Call classes from Blizzard API, format data, and return as JSON
     def classes
       class_data = BlizzardApi::Wow::PlayableClass.new.index
 
@@ -53,9 +59,11 @@ module Api
       render json: class_data[:classes], status: :ok
     end
 
+    # Call mounts from Blizzard API, format data, and return as JSON
     def mounts
       mount_index = BlizzardApi::Wow::Mount.new.index
 
+      # Call mount details for each mount, loops through 1k+ mounts
       mount_index[:mounts].each do |mount|
         mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
       end
@@ -65,11 +73,14 @@ module Api
       render json: mount_index[:mounts], status: :ok
     end
 
+    # Call character profile from Blizzard API, format data, and return as JSON
     def profile
       character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
 
+      # Call character data
       character_data = character.get(params[:realm], params[:character])
 
+      # Call character mounts
       character_data[:mounts] = character.mounts(params[:realm], params[:character])
 
       formatted_data = format_characters(character_data)
@@ -79,6 +90,7 @@ module Api
 
     private
 
+    # Format data from Blizzard API
     def format_realm(data)
       data[:realms].each do |realm|
         realm[:name] = realm[:name][:en_US]
@@ -87,6 +99,7 @@ module Api
       end
     end
 
+    # Format data from Blizzard API
     def format_classes(data)
       data[:classes].each do |classes|
         classes[:name] = classes[:name][:en_US]
@@ -94,21 +107,25 @@ module Api
       end
     end
 
+    # Format data from Blizzard API
     def format_races(data)
       data[:races].each do |race|
         race[:name] = race[:name][:en_US]
         race.delete(:key)
       end
       
+      # One race has two IDs, so delete the duplicate
       data[:races].delete_if { |race| race[:id] == 70 }
     end
 
+    # Format data from Blizzard API
     def format_mounts(data)
       data[:mounts].each do |mount|
         mount[:name] = mount[:name][:en_US]
         mount.delete(:key)
         mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
         
+        # Some mounts don't have a faction, source, or requirements, so check if they exist before formatting
         if mount[:mount_detail][:faction]
           mount[:mount_detail][:faction] = mount[:mount_detail][:faction][:name][:en_US]
         end
@@ -118,6 +135,7 @@ module Api
         end
 
         if mount[:mount_detail][:requirements]
+          # Some mounts have multiple requirements, so check if they exist before formatting
           if mount[:mount_detail][:requirements][:faction]
             mount[:mount_detail][:requirements][:faction] = mount[:mount_detail][:requirements][:faction][:name][:en_US]
           end
@@ -138,7 +156,9 @@ module Api
       end
     end
 
-    def format_characters(data)     
+    # Character data has a lot of data I don't need, so I'm only formatting the data I need and making a new hash
+    def format_characters(data)
+      # Format character mounts     
       data[:mounts][:mounts].each do |mount|
         mount[:name] = mount[:mount][:name][:en_US]
         mount[:id] = mount[:mount][:id]
@@ -146,6 +166,7 @@ module Api
         mount.delete(:is_useable)
       end
 
+      # New hash with only the data I need
       formatted_character = {
         name: data[:name],
         realm: data[:realm][:slug],
