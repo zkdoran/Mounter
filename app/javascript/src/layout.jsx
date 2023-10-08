@@ -18,6 +18,13 @@ class Layout extends Component {
     this.authenicate();
   }
 
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  // Login call
   login = (e) => {
     const { username, password } = this.state;
     e.preventDefault();
@@ -51,6 +58,7 @@ class Layout extends Component {
       })
   }
 
+  // Signup call, auto runs the login call if successful
   signup = (e) => {
     const { username, password, email } = this.state;
     e.preventDefault();
@@ -79,6 +87,7 @@ class Layout extends Component {
       })
   }
 
+  // Authenticate call to check if user is logged in
   authenicate = () => {
     fetch('/api/sessions/authenticate', safeCredentials({
       method: 'GET',
@@ -104,6 +113,7 @@ class Layout extends Component {
       })
   }
 
+  // Logout call
   endSession = () => {
     fetch('/api/sessions/logout', safeCredentials({
       method: 'DELETE',
@@ -126,12 +136,6 @@ class Layout extends Component {
           logoutError: 'Error logging out',
         })
       })
-  }
-
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value,
-    })
   }
 
   render() {
