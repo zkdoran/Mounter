@@ -10,6 +10,7 @@ module Api
           httponly: true,
         }
 
+        # Return the user's characters
         user_characters = @user.characters
 
         render json: { success: true, characters: user_characters }, status: :created
@@ -23,6 +24,7 @@ module Api
       session = Session.find_by(token: token)
 
       if session
+        # If the session is valid, return the user's characters
         user_characters = session.user.characters
 
         render json: { success: true, characters: user_characters }, status: :ok
@@ -31,6 +33,7 @@ module Api
       end
     end
 
+    # Logs the user out by deleting the session
     def destroy
       token = cookies.signed[:mounter_session_token]
       session = Session.find_by(token: token)
