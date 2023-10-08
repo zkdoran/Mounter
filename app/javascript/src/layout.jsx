@@ -10,7 +10,8 @@ class Layout extends Component {
     errors: {},
     loggedIn: false,
     userRoster: [],
-    authError: '',
+    authError: {},
+    logoutError: '',
   }
 
   componentDidMount() {
@@ -82,7 +83,12 @@ class Layout extends Component {
     fetch('/api/sessions/authenticate', safeCredentials({
       method: 'GET',
     }))
-      .then(handleErrors)
+      .then(response => {
+        if (!response.ok) {
+          throw response.json();
+        }
+        return response.json();
+      })
       .then(response => {
         if (response.success) {
           this.setState({
@@ -92,9 +98,8 @@ class Layout extends Component {
         }
       })
       .catch(error => {
-        console.log(error);
         this.setState({
-          authError: 'Error authenticating',
+          authError: error,
         })
       })
   }
@@ -118,7 +123,7 @@ class Layout extends Component {
       .catch(error => {
         console.log(error);
         this.setState({
-          error: 'Error logging out',
+          logoutError: 'Error logging out',
         })
       })
   }
