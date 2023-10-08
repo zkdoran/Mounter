@@ -38,16 +38,20 @@ module Api
       end
     end
 
+    # Removes a character from the user's roster
     def destroy
+      # Check if user is logged in
       token = cookies.signed[:mounter_session_token]
       session = Session.find_by(token: token)
 
       if session
         current_user = session.user
 
+        # Check if character exists in the database
         character = Character.find_by(id: params[:id])
 
         if character
+          # Remove the character from the user's roster
           current_user.characters.delete(character)
 
           render json: { success: true, message: "Character deleted successfully.", characters: current_user.characters }, status: :ok
