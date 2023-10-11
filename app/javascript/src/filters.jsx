@@ -240,21 +240,21 @@ class Filters extends Component {
 
     return (
       <React.Fragment>
-        <div className="row filters">
-          <div className="col">
-            <button className="btn btn-primary" onClick={this.listChoice} name="listChoice" value="all">All</button>
-            <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="collected">Collected</button>
-            <button className="btn btn-primary" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="uncollected">Not Collected</button>
+        <div className="filters">
+          <div className="">
+            <button className="" onClick={this.listChoice} name="listChoice" value="all">All</button>
+            <button className="" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="collected">Collected</button>
+            <button className="" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="uncollected">Not Collected</button>
           </div>
-          <div className="col">
-            <select className="col faction" onChange={this.handleChange}>
+          <div className="">
+            <select className="faction" onChange={this.handleChange}>
               <option>Select a Faction</option>
               <option name="factionFilter" value="Alliance">Alliance</option>
               <option name="factionFilter" value="Horde">Horde</option>
             </select>
           </div>
-          <div className="col">
-            <select className="col source" onChange={this.handleChange}>
+          <div className="">
+            <select className="source" onChange={this.handleChange}>
               <option>Select a Source</option>
               {source.map(source => {
                 return (
@@ -263,8 +263,8 @@ class Filters extends Component {
               })}
             </select>
           </div>
-          <div className="col">
-            <select className="col races" onChange={this.handleChange}>
+          <div className="">
+            <select className="races" onChange={this.handleChange}>
               <option>Select a Race</option>
               {races.map(race => {
                 return (
@@ -273,8 +273,8 @@ class Filters extends Component {
               })}
             </select>
           </div>
-          <div className="col">
-            <select className="col classes" onChange={this.handleChange}>
+          <div className="">
+            <select className="classes" onChange={this.handleChange}>
               <option>Select a Class</option>
               {classes.map(playableClass => {
                 return (
@@ -283,11 +283,11 @@ class Filters extends Component {
               })}
             </select>
           </div>
-          <div className="col">
+          <div className="">
             <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
-            <label className="useablecheck" htmlFor="useable">Is Usable?</label>
+            <label className="" htmlFor="useable">Is Usable?</label>
           </div>
-          <button className="col" onClick={this.mountListMaker}>Filter</button>
+          <button className="" onClick={this.mountListMaker}>Filter</button>
         </div>
         <Mounts mountDisplay={mountDisplay} />
       </React.Fragment>

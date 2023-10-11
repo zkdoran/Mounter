@@ -143,63 +143,63 @@ class Layout extends Component {
 
     return (
       <React.Fragment>
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-          <div className="container-fluid">
-            <a className="navbar-brand" href="#">Mounter</a>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
+        <nav className="">
+          <div className="">
+            <a className="" href="#">Mounter</a>
+            <button className="" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span className=""></span>
             </button> 
             {loggedIn ?  (
-              <div className="collapse navbar-collapse" id="navbarNav">
-                <ul className="navbar-nav">
-                  <li className="nav-item">
-                    <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div className="" id="navbarNav">
+                <ul className="">
+                  <li className="">
+                    <div className="">
+                      <button className="" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Roster
                       </button>
-                      <ul class="dropdown-menu">
+                      <ul className="">
                         {userRoster.map(character => {
                           return (
-                            <li><a class="dropdown-item" href="#" name={character.name} realm={character.realm} region={character.region}>{character.name}</a></li>
+                            <li><a className="" href="#" name={character.name} realm={character.realm} region={character.region}>{character.name}</a></li>
                           )
                         })}
                       </ul>
                     </div>
                   </li>
-                  <li className="nav-item">
-                    <button className="btn btn-danger" onClick={this.endSession}>Logout</button>
+                  <li className="">
+                    <button className="" onClick={this.endSession}>Logout</button>
                   </li>
                   {error && 
-                    <li className="nav-item"> 
-                      <p className="text-danger mt-2">{error}</p>
+                    <li className=""> 
+                      <p className="">{error}</p>
                     </li>
                   }
                 </ul>
               </div>
               ) : (
-              <div className="collapse navbar-collapse" id="navbarNav">            
+              <div className="" id="">            
                 <form onSubmit={this.login}>
-                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="btn btn-danger btn-block btn-lg">Log in</button>
+                  <input name="username" type="text" className="" placeholder="Username" value={username} onChange={this.handleChange} required />
+                  <input name="password" type="password" className="" placeholder="Password" value={password} onChange={this.handleChange} required />
+                  <button type="submit" className="">Log in</button>
                   {error && <p className="text-danger mt-2">{error}</p>}
                 </form>
                 <form className="d-flex" onSubmit={this.signup}>
-                  <input name="username" type="text" className="form-control form-control-lg mb-3" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="email" type="text" className="form-control form-control-lg mb-3" placeholder="Email" value={email} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="form-control form-control-lg mb-3" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="btn btn-danger btn-block btn-lg">Sign up</button>
-                  {error && <p className="text-danger mt-2">{error}</p>}
+                  <input name="username" type="text" className="" placeholder="Username" value={username} onChange={this.handleChange} required />
+                  <input name="email" type="text" className="" placeholder="Email" value={email} onChange={this.handleChange} required />
+                  <input name="password" type="password" className="" placeholder="Password" value={password} onChange={this.handleChange} required />
+                  <button type="submit" className="">Sign up</button>
+                  {error && <p className="">{error}</p>}
                 </form>
               </div>
               )}         
           </div>
         </nav>
         {this.props.children}
-        <footer className="p-3 bg-light">
-          <div className="container">
-            <div className="row">
-              <div className="col text-center">
+        <footer className="">
+          <div className="">
+            <div className="">
+              <div className="">
                 <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
               </div>
             </div>

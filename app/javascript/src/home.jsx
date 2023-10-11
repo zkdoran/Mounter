@@ -149,15 +149,15 @@ class Home extends React.Component {
     return (
       <div className="home">
         <Layout>
-          <div className="container">
-            <div className="row">
-              <div className="col text-center banner py-5">
+          <div className="">
+            <div className="">
+              <div className="banner">
                 <h1>Mounter</h1>
                 <p>Mounter is a web application that allows you to track your mounts in World of Warcraft.</p>
               </div>
             </div>
-            <div className="row dropdowns">
-              <select className="col region" onChange={this.handleChange}>
+            <div className="dropdowns">
+              <select className="region" onChange={this.handleChange}>
                 <option>Select a Region</option>
                 {region.map(region => {
                   return (
@@ -165,7 +165,7 @@ class Home extends React.Component {
                   )
                 })}
               </select>
-              <select className="col realm" onChange={this.handleChange}>
+              <select className="realm" onChange={this.handleChange}>
                 <option>Select a Realm</option>
                 {realmList.map(realm => {
                   return (
@@ -173,13 +173,13 @@ class Home extends React.Component {
                   )
                 })}
               </select>
-              <input className="col characterM" type="text" placeholder="Character Name" name="userCharacter" onChange={this.handleChange}/>
-              <button className="col" onClick={this.getProfile}>Search</button>
-              <button className="col" onClick={this.addCharacter}>Add to Roster</button>
+              <input className="character" type="text" placeholder="Character Name" name="userCharacter" onChange={this.handleChange}/>
+              <button className="" onClick={this.getProfile}>Search</button>
+              <button className="" onClick={this.addCharacter}>Add to Roster</button>
             </div>
-            <div className="row">
+            <div className="">
               {profileError ?
-                <div className="alert alert-danger" role="alert">
+                <div className="" role="alert">
                   {profileError}
                 </div>
                 : <br />
