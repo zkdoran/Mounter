@@ -16,19 +16,7 @@ module.exports = {
   },
   daisyui: {
     themes: [
-      {
-        mytheme: {
-          "primary": "#a0f7c3",
-          "secondary": "#c3ed6f",
-          "accent": "#edb682",
-          "neutral": "#1e1b23",
-          "base-100": "#474747",
-          "info": "#9aa8df",
-          "success": "#1bda64",
-          "warning": "#f0a133",
-          "error": "#e32b40",
-        },
-      },
+      "business",
     ],
   },
   plugins: [
