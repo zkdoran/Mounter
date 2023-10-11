@@ -42,3 +42,5 @@ yarn-debug.log*
 .env
 todolist.txt
 dump.rdb
+/app/assets/builds/*
+!/app/assets/builds/.keep
