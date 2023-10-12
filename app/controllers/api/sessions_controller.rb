@@ -5,7 +5,7 @@ module Api
 
       if @user and BCrypt::Password.new(@user.password) == params[:user][:password]
         session = @user.sessions.create
-        cookies.permenant.signed[:mounter_session_token] = {
+        cookies.permanent.signed[:mounter_session_token] = {
           value: session.token,
           httponly: true,
         }
