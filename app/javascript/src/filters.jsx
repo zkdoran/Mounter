@@ -23,7 +23,7 @@ class Filters extends Component {
   }
 
   componentDidMount() {
-    this.getMounts();
+    //this.getMounts();
     this.getRaces();
     this.getClasses();
   }
