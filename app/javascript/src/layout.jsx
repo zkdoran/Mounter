@@ -1,6 +1,9 @@
 // layout.js
 import React, { Component } from 'react';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
+import LoginWidget from './loginWidget';
+import SignupWidget from './signupWidget';
+import LogoutWidget from './logoutWidget';
 
 class Layout extends Component {
   state = {  
@@ -11,7 +14,7 @@ class Layout extends Component {
     loggedIn: false,
     userRoster: [],
     authError: {},
-    logoutError: '',
+    show_login: true,
   }
 
   componentDidMount() {
@@ -24,67 +27,24 @@ class Layout extends Component {
     })
   }
 
-  // Login call
-  login = (e) => {
-    const { username, password } = this.state;
-    e.preventDefault();
-
-    fetch('/api/sessions', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        user: {
-          username,
-          password,
-        }
-      })
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: response.characters,
-            loggedIn: true,
-            username: '',
-            password: '',
-            email: '',
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error logging in',
-        })
-      })
+  toggle = () => {
+    this.setState({
+      show_login: !this.state.show_login,
+    })
   }
 
-  // Signup call, auto runs the login call if successful
-  signup = (e) => {
-    const { username, password, email } = this.state;
-    e.preventDefault();
+  handleLogin = () => {
+    this.setState({
+      loggedIn: true,
+    })
+    document.getElementById('my_modal_3').close();
+  }
 
-    fetch('/api/users', safeCredentials({
-      method: 'POST',
-      body: JSON.stringify({
-        user: {
-          username,
-          password,
-          email,
-        }
-      })
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.login();
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          error: 'Error signing up',
-        })
-      })
+  handleLogout = () => {
+    this.setState({
+      loggedIn: false,
+    })
+    document.getElementById('my_modal_3').close();
   }
 
   // Authenticate call to check if user is logged in
@@ -113,97 +73,72 @@ class Layout extends Component {
       })
   }
 
-  // Logout call
-  endSession = () => {
-    fetch('/api/sessions/logout', safeCredentials({
-      method: 'DELETE',
-    }))
-      .then(handleErrors)
-      .then(response => {
-        if (response.success) {
-          this.setState({
-            userRoster: [],
-            loggedIn: false,
-            username: '',
-            password: '',
-            email: '',
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({
-          logoutError: 'Error logging out',
-        })
-      })
-  }
-
   render() {
-    const { username, password, email, error, loggedIn, userRoster } = this.state;
+    const { loggedIn, userRoster, show_login } = this.state;
 
     return (
       <React.Fragment>
-        <nav className="">
-          <div className="">
-            <a className="" href="#">Mounter</a>
-            <button className="" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span className=""></span>
-            </button> 
-            {loggedIn ?  (
-              <div className="" id="navbarNav">
-                <ul className="">
-                  <li className="">
-                    <div className="">
-                      <button className="" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Roster
-                      </button>
-                      <ul className="">
-                        {userRoster.map(character => {
-                          return (
-                            <li><a className="" href="#" name={character.name} realm={character.realm} region={character.region}>{character.name}</a></li>
-                          )
-                        })}
-                      </ul>
-                    </div>
-                  </li>
-                  <li className="">
-                    <button className="" onClick={this.endSession}>Logout</button>
-                  </li>
-                  {error && 
-                    <li className=""> 
-                      <p className="">{error}</p>
-                    </li>
-                  }
-                </ul>
-              </div>
-              ) : (
-              <div className="" id="">            
-                <form onSubmit={this.login}>
-                  <input name="username" type="text" className="" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="">Log in</button>
-                  {error && <p className="text-danger mt-2">{error}</p>}
-                </form>
-                <form className="d-flex" onSubmit={this.signup}>
-                  <input name="username" type="text" className="" placeholder="Username" value={username} onChange={this.handleChange} required />
-                  <input name="email" type="text" className="" placeholder="Email" value={email} onChange={this.handleChange} required />
-                  <input name="password" type="password" className="" placeholder="Password" value={password} onChange={this.handleChange} required />
-                  <button type="submit" className="">Sign up</button>
-                  {error && <p className="">{error}</p>}
-                </form>
-              </div>
-              )}         
+        <div className="navbar bg-base-300 rounded-box">
+          <div className="flex-1 px-2 lg:flex-none">
+            <a className="text-lg font-bold">Mounter</a>
           </div>
-        </nav>
-        {this.props.children}
-        <footer className="">
-          <div className="">
-            <div className="">
-              <div className="">
-                <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
+          {loggedIn ?
+            <div className="flex justify-end flex-1 px-2">
+              <div className="flex items-stretch">
+                <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log Out</button>
+                <dialog id="my_modal_3" className="modal">
+                  <div className="modal-box flex flex-col items-center justify-center">
+                    <form method="dialog">
+                      <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <LogoutWidget onLogout={this.handleLogout} />
+                  </div>
+                </dialog>
+                <div className="dropdown dropdown-end">
+                  <label tabIndex={0} className="btn btn-ghost rounded-btn">Roster</label>
+                  <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-300 rounded-box w-52 mt-4">
+                    {userRoster.length === 0 &&
+                      <li>
+                        <p>No characters added</p>
+                      </li>
+                    }
+                    {userRoster.map((character) => {
+                        return (
+                          <li>
+                            <p>{character.name}</p>
+                            <button className="btn btn-ghost">Delete</button>
+                            <button className="btn btn-ghost">
+                              <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
+                            </button>
+                          </li>
+                        )
+                      }
+                    )}
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
+          :
+            <div className="flex justify-end flex-1 px-2">
+              <div className="flex items-stretch">
+                <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log In</button>
+                <dialog id="my_modal_3" className="modal">
+                  <div className="modal-box">
+                    <form method="dialog">
+                      <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    {show_login ?  <LoginWidget toggle={this.toggle} onLogin={this.handleLogin} /> : <SignupWidget toggle={this.toggle} onLogin={this.handleLogin} />}
+                  </div>
+                </dialog>
+              </div>
+            </div>          
+          }
+        </div>
+        {this.props.children}
+        <footer className="footer footer-center p-4 bg-base-300 text-base-content">
+          <aside>
+            <p>Mounter is not affiliated with Blizzard Entertainment® or World of Warcraft®.</p>
+          </aside>
         </footer>
       </React.Fragment>
     );
