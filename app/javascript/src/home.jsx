@@ -18,6 +18,7 @@ class Home extends React.Component {
     userRealm: '',
     userCharacter: '',
     profileError: '',
+    characterError: '',
   }
 
   componentDidMount() {
@@ -92,7 +93,7 @@ class Home extends React.Component {
       .catch(error => {
         console.log(error);
         this.setState({
-          error: 'Error adding character',
+          characterError: 'Error adding character',
         })
       })
   }
@@ -147,17 +148,18 @@ class Home extends React.Component {
     const { region, characterData, realmList, profileError } = this.state;
     
     return (
-      <div className="home">
         <Layout>
-          <div className="">
-            <div className="">
-              <div className="banner">
-                <h1>Mounter</h1>
-                <p>Mounter is a web application that allows you to track your mounts in World of Warcraft.</p>
+          <div className="container mx-auto px-4">
+            <div className="hero min-h-[50%] bg-base-200 py-4">
+              <div className="hero-content text-center">
+                <div className="max-w-md">
+                  <h1 className="text-5xl font-bold">Welcome to Mounter!</h1>
+                  <p className="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+                </div>
               </div>
             </div>
-            <div className="dropdowns">
-              <select className="region" onChange={this.handleChange}>
+            <div className="dropdowns flex space-x-4 justify-center py-5">
+              <select className="region select select-accent" onChange={this.handleChange}>
                 <option>Select a Region</option>
                 {region.map(region => {
                   return (
@@ -165,7 +167,7 @@ class Home extends React.Component {
                   )
                 })}
               </select>
-              <select className="realm" onChange={this.handleChange}>
+              <select className="realm select select-accent" onChange={this.handleChange}>
                 <option>Select a Realm</option>
                 {realmList.map(realm => {
                   return (
@@ -173,22 +175,20 @@ class Home extends React.Component {
                   )
                 })}
               </select>
-              <input className="character" type="text" placeholder="Character Name" name="userCharacter" onChange={this.handleChange}/>
-              <button className="" onClick={this.getProfile}>Search</button>
-              <button className="" onClick={this.addCharacter}>Add to Roster</button>
+              <input type="text" placeholder="Character Name" className="input input-bordered input-accent w-full max-w-xs" name="userCharacter" onChange={this.handleChange} />
+              <button className="btn btn-primary" onClick={this.getProfile}>Search</button>
+              <button className="btn btn-secondary" onClick={this.addCharacter}>Add to Roster</button>
             </div>
-            <div className="">
-              {profileError ?
-                <div className="" role="alert">
-                  {profileError}
+            {profileError && (
+              <div className="toast toast-end">
+                <div className="alert alert-error">
+                  <span>{profileError}</span>
                 </div>
-                : <br />
-              }
-            </div>
+              </div>
+            )}
             <Filters characterData={characterData} />
           </div>
         </Layout>
-      </div>
     )
   }
 }
