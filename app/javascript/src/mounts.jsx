@@ -10,6 +10,7 @@ class Mounts extends Component {
     return (
       <React.Fragment>
         <div className="mounts">
+          <h1 className="text-4xl font-bold mb-4">Mounts: {mountDisplay.length}</h1>
           <div className="grid lg:grid-cols-4 gap-12">
             {mountDisplay.map(mount => {
               if (mount.mount_detail.should_exclude_if_uncollected) {
