@@ -30,6 +30,7 @@ class Home extends React.Component {
     fetch('/api/calls/realms/')
       .then(handleErrors)
       .then(data => {
+        console.log(data)
         this.setState({
           realms: data,
         })
@@ -104,11 +105,11 @@ class Home extends React.Component {
      
     this.setState({
       [name]: value,
-    }); 
-  
-    if (name === 'userRegion') {
-      this.realmSwitch();
-    }
+    }, () => {
+      if (name === 'userRegion') {
+        this.realmSwitch();
+      }
+    })
   }
   
   // This function is to switch the realm list based on the user's region
@@ -150,34 +151,34 @@ class Home extends React.Component {
     return (
         <Layout>
           <div className="container mx-auto px-4">
-            <div className="hero min-h-[50%] bg-base-200 py-4">
+            <div className="hero min-h-[50%] bg-base-200 py-4 mb-5">
               <div className="hero-content text-center">
                 <div className="max-w-md">
                   <h1 className="text-5xl font-bold">Welcome to Mounter!</h1>
-                  <p className="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+                  <p className="py-6">A World of Warcraft mount finder and filter site.</p>
                 </div>
               </div>
             </div>
             <div className="dropdowns flex space-x-4 justify-center py-5">
-              <select className="region select select-accent" onChange={this.handleChange}>
+              <select className="region select select-accent" name="userRegion" onChange={this.handleChange}>
                 <option>Select a Region</option>
                 {region.map(region => {
                   return (
-                    <option key={region} name="userRegion" value={region}>{region.toUpperCase()}</option>
+                    <option key={region} value={region}>{region.toUpperCase()}</option>
                   )
                 })}
               </select>
-              <select className="realm select select-accent" onChange={this.handleChange}>
+              <select className="realm select select-accent w-44" name="userRealm" onChange={this.handleChange}>
                 <option>Select a Realm</option>
                 {realmList.map(realm => {
                   return (
-                    <option key={realm.id} name="userRealm" value={realm.slug}>{realm.name}</option>
+                    <option key={realm.id} value={realm.slug}>{realm.name}</option>
                   )
                 })}
               </select>
-              <input type="text" placeholder="Character Name" className="input input-bordered input-accent w-full max-w-xs" name="userCharacter" onChange={this.handleChange} />
-              <button className="btn btn-primary" onClick={this.getProfile}>Search</button>
-              <button className="btn btn-secondary" onClick={this.addCharacter}>Add to Roster</button>
+              <input type="text" placeholder="Character Name" className="input input-bordered input-accent w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
+              <button className="btn btn-primary rounded-lg" onClick={this.getProfile}>Search</button>
+              <button className="btn btn-secondary rounded-lg" onClick={this.addCharacter}>Add to Roster</button>
             </div>
             {profileError && (
               <div className="toast toast-end">
@@ -186,6 +187,7 @@ class Home extends React.Component {
                 </div>
               </div>
             )}
+            <div className="divider"></div>
             <Filters characterData={characterData} />
           </div>
         </Layout>
