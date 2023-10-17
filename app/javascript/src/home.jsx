@@ -12,13 +12,15 @@ class Home extends React.Component {
     realms: {},
     region: ['us', 'eu', 'kr', 'tw'],
     characterData: {},
-    buttonDisabled: true,
     realmList: [],
     userRegion: '',
     userRealm: '',
     userCharacter: '',
     profileError: '',
     characterError: '',
+    showToast: false,
+    profileSuccess: false,
+    characterSuccess: false,
   }
 
   componentDidMount() {
@@ -48,6 +50,8 @@ class Home extends React.Component {
     if (this.state.userRegion === '' || this.state.userRealm === '' || this.state.userCharacter === '') {
       this.setState({
         profileError: 'Please fill out all fields',
+      }, () => {
+        this.showToast();
       })
       return;
     }
@@ -57,14 +61,21 @@ class Home extends React.Component {
       .then(data => {
         this.setState({
           characterData: data,
-          buttonDisabled: false,
         })
       })
-      .then(() => this.mountListSplit())
+      .then(() => {
+        this.setState({
+          profileSuccess: true,
+        }, () => {
+          this.showToast();
+        })
+      })
       .catch(error => {
         console.log(error)
         this.setState({
           profileError: 'Character not found',
+        }, () => {
+          this.showToast();
         })
       })
   }
@@ -91,10 +102,19 @@ class Home extends React.Component {
           })
         }
       })
+      .then(() => {
+        this.setState({
+          characterSuccess: true,
+        }, () => {
+          this.showToast();
+        })
+      })
       .catch(error => {
         console.log(error);
         this.setState({
           characterError: 'Error adding character',
+        }, () => {
+          this.showToast();
         })
       })
   }
@@ -144,9 +164,23 @@ class Home extends React.Component {
       realmList: subRealmList,
     })
   }
+  
+  showToast = () => {
+    this.setState({
+      showToast: true,
+    })
+
+    setTimeout(this.hideToast, 5000);
+  }
+
+  hideToast = () => {
+    this.setState({
+      showToast: false,
+    })
+  }
 
   render() {
-    const { region, characterData, realmList, profileError } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast } = this.state;
     
     return (
         <Layout>
@@ -183,10 +217,31 @@ class Home extends React.Component {
               </button>
               <button className="btn btn-secondary rounded-lg" onClick={this.addCharacter}>Add to Roster</button>
             </div>
-            {profileError && (
-              <div className="toast toast-end">
+            {profileError && showToast && (
+              <div className="toast toast-end z-50">
                 <div className="alert alert-error">
                   <span>{profileError}</span>
+                </div>
+              </div>
+            )}
+            {profileSuccess && showToast && (
+              <div className="toast toast-end z-50">
+                <div className="alert alert-success">
+                  <span>Character Found</span>
+                </div>
+              </div>
+            )}
+            {characterError && showToast && (
+              <div className="toast toast-end z-50">
+                <div className="alert alert-error">
+                  <span>{characterError}</span>
+                </div>
+              </div>
+            )}
+            {characterSuccess && showToast && (
+              <div className="toast toast-end z-50">
+                <div className="alert alert-success">
+                  <span>Character Added</span>
                 </div>
               </div>
             )}
