@@ -23,7 +23,7 @@ class Filters extends Component {
   }
 
   componentDidMount() {
-    //this.getMounts();
+    this.getMounts();
     this.getRaces();
     this.getClasses();
   }
@@ -175,7 +175,6 @@ class Filters extends Component {
     // If filters are selected, filter mounts based on filters
     const filteredMounts = subMountDisplay.filter(mount => {
       let sourceCondition = true;
-      let raceCondition = true;
       let classCondition = true;
       let factionCondition = true;
   
@@ -185,27 +184,11 @@ class Filters extends Component {
       }
   
       // Not all mounts have requirements, so check if requirements exists
-      // There are three possible keys under requirements, so check if each key exists then filter if they exist
-      if (raceFilter !== '') {
-        if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
-          raceCondition = mount.mount_detail.requirements.races === raceFilter;
-        } else {
-          raceCondition = false;
-        }
-      } else {
-        if ('requirements' in mount.mount_detail && 'races' in mount.mount_detail.requirements) {
-          raceCondition = false;
-        }
-      }
-  
+      // There are three possible keys under requirements, so check if each key exists then filter if they exist  
       if (classFilter !== '') {
         if ('requirements' in mount.mount_detail && 'classes' in mount.mount_detail.requirements) {
           classCondition = mount.mount_detail.requirements.classes === classFilter;
         } else {
-          classCondition = false;
-        }
-      } else {
-        if ('requirements' in mount.mount_detail && 'classes' in mount.mount_detail.requirements) {
           classCondition = false;
         }
       }
@@ -216,14 +199,10 @@ class Filters extends Component {
         } else {
           factionCondition = false;
         }
-      } else {
-        if ('requirements' in mount.mount_detail && 'faction' in mount.mount_detail.requirements) {
-          factionCondition = false;
-        }
       }
   
       // Since some mounts can have multiple requirements, the mount must fulfill them all or it will not be displayed
-      return sourceCondition && raceCondition && classCondition && factionCondition;
+      return sourceCondition && classCondition && factionCondition;
     });
 
     subMountDisplay = filteredMounts;
@@ -268,43 +247,27 @@ class Filters extends Component {
               aria-label="List Uncollected" 
             />
           </div>
-          <div className="">
             <select className="faction select select-accent" name="factionFilter" onChange={this.handleChange}>
-              <option>Select a Faction</option>
+              <option value="">Select a Faction</option>
               <option value="Alliance">Alliance</option>
               <option value="Horde">Horde</option>
             </select>
-          </div>
-          <div className="">
             <select className="source select select-accent" name="sourceFilter" onChange={this.handleChange}>
-              <option>Select a Source</option>
+              <option value="">Select a Source</option>
               {source.map(source => {
                 return (
                   <option key={source} value={source}>{source}</option>
                 )
               })}
             </select>
-          </div>
-          <div className="">
-            <select className="races select select-accent" name="raceFilter" onChange={this.handleChange}>
-              <option>Select a Race</option>
-              {races.map(race => {
-                return (
-                  <option key={race.id} value={race.name}>{race.name}</option>
-                )
-              })}
-            </select>
-          </div>
-          <div className="">
             <select className="classes select select-accent" name="classFilter" onChange={this.handleChange}>
-              <option>Select a Class</option>
+              <option value="">Select a Class</option>
               {classes.map(playableClass => {
                 return (
                   <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
                 )
               })}
             </select>
-          </div>
           <div className="form-control">
             <label className="cursor-pointer label">
               <span className="label-text mr-2">Is Usable?</span>
