@@ -7,12 +7,10 @@ class Filters extends Component {
   state = {
     mounts: [],
     classes: [],
-    races: [],
     characterData: this.props.characterData,
     listChoice: '',
     factionFilter: '',
     sourceFilter: '',
-    raceFilter: '',
     classFilter: '',
     isUseable: false,
     buttonDisabled: true,
@@ -24,7 +22,6 @@ class Filters extends Component {
 
   componentDidMount() {
     this.getMounts();
-    this.getRaces();
     this.getClasses();
   }
 
@@ -39,17 +36,6 @@ class Filters extends Component {
       })
       .then(() => {
         this.mountListMaker()
-      })
-  }
-
-  // This function is to get the playable races for the races list
-  getRaces = () => {
-    fetch('/api/calls/races')
-      .then(handleErrors)
-      .then(data => {
-        this.setState({
-          races: data,
-        })
       })
   }
 
@@ -112,7 +98,7 @@ class Filters extends Component {
   // I combined both the filter and list switch into one function since I wanted to reduce setState calls
   // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
   mountListMaker = () => {
-    const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, raceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
+    const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
     let subMountDisplay = [];
 
     // If no listChoice is selected, default to all
@@ -165,7 +151,7 @@ class Filters extends Component {
     }
 
     // If no filters are selected, display mounts based on switch and isUseable
-    if (sourceFilter === '' && raceFilter === '' && classFilter === '' && factionFilter === '') {
+    if (sourceFilter === '' && classFilter === '' && factionFilter === '') {
       this.setState({
         mountDisplay: subMountDisplay,
       })
@@ -184,7 +170,7 @@ class Filters extends Component {
       }
   
       // Not all mounts have requirements, so check if requirements exists
-      // There are three possible keys under requirements, so check if each key exists then filter if they exist  
+      // There are three possible keys under requirements, so check if each key exists then filter if they exist. Removed race since it's a low amount of race specific mounts.  
       if (classFilter !== '') {
         if ('requirements' in mount.mount_detail && 'classes' in mount.mount_detail.requirements) {
           classCondition = mount.mount_detail.requirements.classes === classFilter;
