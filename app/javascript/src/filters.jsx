@@ -240,54 +240,85 @@ class Filters extends Component {
 
     return (
       <React.Fragment>
-        <div className="filters">
-          <div className="">
-            <button className="" onClick={this.listChoice} name="listChoice" value="all">All</button>
-            <button className="" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="collected">Collected</button>
-            <button className="" disabled={buttonDisabled} onClick={this.handleChange} name="listChoice" value="uncollected">Not Collected</button>
+        <div className="filters dropdowns flex space-x-4 justify-center py-5">
+          <div className="join">
+            <input 
+              className="join-item btn" 
+              onChange={this.handleChange} 
+              type="radio" name="listChoice" 
+              value="all" 
+              aria-label="List All" 
+            />
+            <input 
+              className="join-item btn" 
+              onChange={this.handleChange} 
+              disabled={buttonDisabled} 
+              type="radio" 
+              name="listChoice" 
+              value="collected" 
+              aria-label="List Collected" 
+            />
+            <input 
+              className="join-item btn" 
+              onChange={this.handleChange} 
+              disabled={buttonDisabled} 
+              type="radio" 
+              name="listChoice" 
+              value="uncollected" 
+              aria-label="List Uncollected" 
+            />
           </div>
           <div className="">
-            <select className="faction" onChange={this.handleChange}>
+            <select className="faction select select-accent" name="factionFilter" onChange={this.handleChange}>
               <option>Select a Faction</option>
-              <option name="factionFilter" value="Alliance">Alliance</option>
-              <option name="factionFilter" value="Horde">Horde</option>
+              <option value="Alliance">Alliance</option>
+              <option value="Horde">Horde</option>
             </select>
           </div>
           <div className="">
-            <select className="source" onChange={this.handleChange}>
+            <select className="source select select-accent" name="sourceFilter" onChange={this.handleChange}>
               <option>Select a Source</option>
               {source.map(source => {
                 return (
-                  <option key={source} name="sourceFilter" value={source}>{source}</option>
+                  <option key={source} value={source}>{source}</option>
                 )
               })}
             </select>
           </div>
           <div className="">
-            <select className="races" onChange={this.handleChange}>
+            <select className="races select select-accent" name="raceFilter" onChange={this.handleChange}>
               <option>Select a Race</option>
               {races.map(race => {
                 return (
-                  <option key={race.id} name="raceFilter" value={race.name}>{race.name}</option>
+                  <option key={race.id} value={race.name}>{race.name}</option>
                 )
               })}
             </select>
           </div>
           <div className="">
-            <select className="classes" onChange={this.handleChange}>
+            <select className="classes select select-accent" name="classFilter" onChange={this.handleChange}>
               <option>Select a Class</option>
               {classes.map(playableClass => {
                 return (
-                  <option key={playableClass.id} name="classFilter" value={playableClass.name}>{playableClass.name}</option>
+                  <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
                 )
               })}
             </select>
           </div>
-          <div className="">
-            <input type="checkbox" disabled={buttonDisabled} checked={isUseable} onChange={this.handleIsUseableChange} />
-            <label className="" htmlFor="useable">Is Usable?</label>
+          <div className="form-control">
+            <label className="cursor-pointer label">
+              <span className="label-text mr-2">Is Usable?</span>
+              <input type="checkbox"
+                name="isUseable"
+                onChange={this.handleChange} 
+                checked={isUseable} 
+                className="checkbox checkbox-accent" />
+            </label>
           </div>
-          <button className="" onClick={this.mountListMaker}>Filter</button>
+          <button className="btn btn-primary rounded-lg" onClick={this.mountListMaker}>
+          <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"/></svg>
+            Filter
+          </button>
         </div>
         <Mounts mountDisplay={mountDisplay} />
       </React.Fragment>
