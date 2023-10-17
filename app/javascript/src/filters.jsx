@@ -7,7 +7,7 @@ class Filters extends Component {
   state = {
     mounts: [],
     classes: [],
-    characterData: this.props.characterData,
+    characterData: {},
     listChoice: '',
     factionFilter: '',
     sourceFilter: '',
@@ -23,6 +23,17 @@ class Filters extends Component {
   componentDidMount() {
     this.getMounts();
     this.getClasses();
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log('componentDidUpdate')
+    if (this.props.characterData !== prevProps.characterData) {
+      this.setState({
+        characterData: this.props.characterData,
+        buttonDisabled: false,
+      }, () => {
+      this.mountListSplit();
+    })}
   }
 
   // This function is to get the mounts for the mount list
@@ -61,12 +72,11 @@ class Filters extends Component {
     } else {
       this.setState({
         [name]: value,
-      }); 
-    }
-
-    if (name === 'listChoice') {
-      this.mountListMaker();
-    }
+      }, () => {
+       if (name === 'listChoice') {
+         this.mountListMaker();
+      }}) 
+    }  
   }
 
   // This function is to split the mounts into two additional lists: collected and uncollected
@@ -201,7 +211,7 @@ class Filters extends Component {
   }
 
   render() {
-    const { mountDisplay, buttonDisabled, source, races, classes, isUseable } = this.state;
+    const { mountDisplay, buttonDisabled, source, classes, isUseable } = this.state;
 
     return (
       <React.Fragment>
@@ -212,7 +222,7 @@ class Filters extends Component {
               onChange={this.handleChange} 
               type="radio" name="listChoice" 
               value="all" 
-              aria-label="List All" 
+              aria-label="All" 
             />
             <input 
               className="join-item btn" 
@@ -221,7 +231,7 @@ class Filters extends Component {
               type="radio" 
               name="listChoice" 
               value="collected" 
-              aria-label="List Collected" 
+              aria-label="Collected" 
             />
             <input 
               className="join-item btn" 
@@ -230,7 +240,7 @@ class Filters extends Component {
               type="radio" 
               name="listChoice" 
               value="uncollected" 
-              aria-label="List Uncollected" 
+              aria-label="Uncollected" 
             />
           </div>
             <select className="faction select select-accent" name="factionFilter" onChange={this.handleChange}>
