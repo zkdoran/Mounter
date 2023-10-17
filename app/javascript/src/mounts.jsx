@@ -32,6 +32,12 @@ class Mounts extends Component {
                           <div className="badge badge-secondary mr-2">{mount.mount_detail.source}</div>
                           : 
                           <p className="badge badge-ghost mr-2">Source: Unknown</p>
+                        }
+                        {mount.mount_detail.faction && mount.mount_detail.faction === 'Alliance' &&
+                          <div className="badge badge-info">{mount.mount_detail.faction}</div>
+                        }
+                        {mount.mount_detail.faction && mount.mount_detail.faction === 'Horde' &&
+                          <div className="badge badge-error">{mount.mount_detail.faction}</div>
                         } 
                       </div>
                       <a 
