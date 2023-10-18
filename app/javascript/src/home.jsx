@@ -4,6 +4,7 @@ import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
 import Layout from '@src/layout';
 import Filters from '@src/filters';
+import Toast from '@src/toast';
 
 import './home.scss';
 
@@ -21,6 +22,7 @@ class Home extends React.Component {
     showToast: false,
     profileSuccess: false,
     characterSuccess: false,
+    successMessage: '',
   }
 
   componentDidMount() {
@@ -41,13 +43,19 @@ class Home extends React.Component {
 
   // This function is to get the character's profile
   getProfile = () => {
-    // Reset profileError so it doesn't persist
+    const { userRegion, userRealm, userCharacter } = this.state;
+
+    // Reset the error and success messages
     this.setState({
       profileError: '',
+      profileSuccess: false,
+      characterError: '',
+      characterSuccess: false,
+      successMessage: '',     
     })
 
     // If any of the fields are blank, display an error
-    if (this.state.userRegion === '' || this.state.userRealm === '' || this.state.userCharacter === '') {
+    if (userRegion === '' || userRealm === '' || userCharacter === '') {
       this.setState({
         profileError: 'Please fill out all fields',
       }, () => {
@@ -56,11 +64,19 @@ class Home extends React.Component {
       return;
     }
 
-    fetch(`/api/calls/profile/${this.state.userRegion}/${this.state.userRealm}/${this.state.userCharacter}`)
-      .then(handleErrors)
+    fetch(`/api/calls/profile/${userRegion}/${userRealm}/${userCharacter}`)
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(error => {
+            throw error;
+          })
+        }
+        return response.json();
+      })
       .then(data => {
         this.setState({
           characterData: data,
+          successMessage: "Character found!",
         })
       })
       .then(() => {
@@ -73,7 +89,7 @@ class Home extends React.Component {
       .catch(error => {
         console.log(error)
         this.setState({
-          profileError: 'Character not found',
+          profileError: error.error,
         }, () => {
           this.showToast();
         })
@@ -83,6 +99,24 @@ class Home extends React.Component {
   // Add a character to the user's roster
   addCharacter = () => {
     const { userRegion, userRealm, userCharacter } = this.state;
+
+    // Reset the error and success messages
+    this.setState({
+      characterError: '',
+      characterSuccess: false,
+      profileError: '',
+      profileSuccess: false,
+    })
+
+    // If any of the fields are blank, display an error
+    if (userRegion === '' || userRealm === '' || userCharacter === '') {
+      this.setState({
+        characterError: 'Please fill out all fields',
+      }, () => {
+        this.showToast();
+      })
+      return;
+    }
 
     fetch('/api/characters', safeCredentials({
       method: 'POST',
@@ -94,11 +128,19 @@ class Home extends React.Component {
         }
       })
     }))
-      .then(handleErrors)
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(error => {
+            throw error;
+          })
+        }
+        return response.json();
+      })
       .then(response => {
         if (response.success) {
           this.setState({
             userRoster: response.characters,
+            successMessage: response.message,
           })
         }
       })
@@ -110,9 +152,8 @@ class Home extends React.Component {
         })
       })
       .catch(error => {
-        console.log(error);
         this.setState({
-          characterError: 'Error adding character',
+          characterError: error.error,
         }, () => {
           this.showToast();
         })
@@ -180,7 +221,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage } = this.state;
     
     return (
         <Layout>
@@ -189,7 +230,7 @@ class Home extends React.Component {
               <div className="hero-content text-center">
                 <div className="max-w-md">
                   <h1 className="text-5xl font-bold">Welcome to Mounter!</h1>
-                  <p className="py-6">A World of Warcraft mount finder and filter site.</p>
+                  <p className="py-6">A World of Warcraft® mount finder and filter site.</p>
                 </div>
               </div>
             </div>
@@ -217,33 +258,17 @@ class Home extends React.Component {
               </button>
               <button className="btn btn-secondary rounded-lg" onClick={this.addCharacter}>Add to Roster</button>
             </div>
-            {profileError && showToast && (
-              <div className="toast toast-end z-50">
-                <div className="alert alert-error">
-                  <span>{profileError}</span>
-                </div>
-              </div>
+            {profileError !== "" && showToast && (
+              <Toast message={profileError} type="error" />
             )}
             {profileSuccess && showToast && (
-              <div className="toast toast-end z-50">
-                <div className="alert alert-success">
-                  <span>Character Found</span>
-                </div>
-              </div>
+              <Toast message={successMessage} type="success" />
             )}
-            {characterError && showToast && (
-              <div className="toast toast-end z-50">
-                <div className="alert alert-error">
-                  <span>{characterError}</span>
-                </div>
-              </div>
+            {characterError !== "" && showToast && (
+              <Toast message={characterError} type="error" />
             )}
             {characterSuccess && showToast && (
-              <div className="toast toast-end z-50">
-                <div className="alert alert-success">
-                  <span>Character Added</span>
-                </div>
-              </div>
+              <Toast message={successMessage} type="success" />
             )}
             <div className="divider"></div>
             <Filters characterData={characterData} />
