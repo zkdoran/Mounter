@@ -270,7 +270,8 @@ class Filters extends Component {
               <input type="checkbox"
                 name="isUseable"
                 onChange={this.handleChange} 
-                checked={buttonDisabled} 
+                checked={isUseable}
+                disabled={buttonDisabled} 
                 className="checkbox checkbox-accent" />
             </label>
           </div>
