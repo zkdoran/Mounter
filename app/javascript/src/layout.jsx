@@ -4,6 +4,7 @@ import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import LoginWidget from './loginWidget';
 import SignupWidget from './signupWidget';
 import LogoutWidget from './logoutWidget';
+import Toast from './toast';
 
 class Layout extends Component {
   state = {  
@@ -15,6 +16,9 @@ class Layout extends Component {
     userRoster: [],
     authError: {},
     show_login: true,
+    logoutSuccess: false,
+    loginSuccess: false,
+    showToast: false,
   }
 
   componentDidMount() {
@@ -36,15 +40,39 @@ class Layout extends Component {
   handleLogin = () => {
     this.setState({
       loggedIn: true,
+      loginSuccess: true,
+      logoutSuccess: false,
+    }, () => {
+      this.showToast();
     })
+
     document.getElementById('my_modal_3').close();
   }
 
   handleLogout = () => {
     this.setState({
       loggedIn: false,
+      logoutSuccess: true,
+      loginSuccess: false,
+    }, () => {
+      this.showToast();
     })
+
     document.getElementById('my_modal_3').close();
+  }
+
+  showToast = () => {
+    this.setState({
+      showToast: true,
+    })
+
+    setTimeout(this.hideToast, 3000);
+  }
+
+  hideToast = () => {
+    this.setState({
+      showToast: false,
+    })
   }
 
   // Authenticate call to check if user is logged in
@@ -74,7 +102,7 @@ class Layout extends Component {
   }
 
   render() {
-    const { loggedIn, userRoster, show_login } = this.state;
+    const { loggedIn, userRoster, show_login, loginSuccess, logoutSuccess, showToast } = this.state;
 
     return (
       <React.Fragment>
@@ -87,7 +115,7 @@ class Layout extends Component {
               <div className="flex items-stretch">
                 <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log Out</button>
                 <dialog id="my_modal_3" className="modal">
-                  <div className="modal-box flex flex-col items-center justify-center">
+                  <div className="modal-box flex flex-col items-center justify-center rounded-lg">
                     <form method="dialog">
                       <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
@@ -123,7 +151,7 @@ class Layout extends Component {
               <div className="flex items-stretch">
                 <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log In</button>
                 <dialog id="my_modal_3" className="modal">
-                  <div className="modal-box">
+                  <div className="modal-box flex flex-col items-center rounded-lg">
                     <form method="dialog">
                       <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
@@ -134,6 +162,12 @@ class Layout extends Component {
             </div>          
           }
         </div>
+        {logoutSuccess && showToast && (
+          <Toast message="Successfully logged out" type="success" />
+        )}
+        {loginSuccess && showToast && (
+          <Toast message="Successfully logged in" type="success" />
+        )}
         {this.props.children}
         <footer className="footer footer-center p-4 bg-base-300 text-base-content">
           <aside>
