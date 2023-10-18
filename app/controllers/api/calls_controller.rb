@@ -77,15 +77,21 @@ module Api
     def profile
       character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
 
-      # Call character data
-      character_data = character.get(params[:realm], params[:character])
+      begin
+        # Call character data
+        character_data = character.get(params[:realm], params[:character])
+      
+        # Call character mounts
+        character_data[:mounts] = character.mounts(params[:realm], params[:character])
+      
+        formatted_data = format_characters(character_data)
+      
+        render json: formatted_data, status: :ok
 
-      # Call character mounts
-      character_data[:mounts] = character.mounts(params[:realm], params[:character])
-
-      formatted_data = format_characters(character_data)
-
-      render json: formatted_data, status: :ok
+      # Rescue from Blizzard API exceptions
+      rescue BlizzardApi::ApiException => e
+        render json: { success: false, error: "Character does not exist.", code: e.code }, status: :not_found
+      end     
     end
 
     private
