@@ -7,18 +7,19 @@ module Api
     
       if session
         current_user = session.user
-    
+        
         # Check if character exists externally
-        if CharacterExistenceChecker.character_exists?(params[:region], params[:realm], params[:name])
+        if CharacterExistenceChecker.character_exists?(params)
     
           # Check if character already exists in the database
-          existing_character = Character.find_by(name: params[:name], realm: params[:realm], region: params[:region])
+          existing_character = Character.find_by(name: params[:character][:name], realm: params[:character][:realm], region: params[:character][:region])
     
           if existing_character
             # Associate the existing character with the current user
             current_user.characters << existing_character
             render json: { success: true, message: "Character added successfully.", characters: current_user.characters }, status: :created
           else
+            # Create a new character if it does not exist in the database
             @character = Character.new(character_params)
     
             if @character.save
@@ -27,7 +28,7 @@ module Api
               render json: { success: true, message: "Character added successfully.", characters: current_user.characters }, status: :created
             else
               # Handle validation errors
-              render json: { success: false, errors: @character.errors.full_messages }, status: :unprocessable_entity
+              render json: { success: false, error: "Unable to add to roster." }, status: :unprocessable_entity
             end
           end
         else
