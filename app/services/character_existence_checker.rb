@@ -12,9 +12,14 @@ class CharacterExistenceChecker
 
   # Does a call to the Blizzard API to check if a character exists
   # Returns true if the character exists, false if it does not
-  def self.character_exists?(region, realm, character_name)
+  def self.character_exists?(params)
+    character_info = params[:character]
+    region = character_info[:region]
+    realm = character_info[:realm]
+    name = character_info[:name]
+
     character = BlizzardApi::Wow::CharacterProfile.new region: region
-    character_data = character.get(realm, character_name)
+    character_data = character.get(realm, name)
     character_data.key?(:name)
   end
 end
