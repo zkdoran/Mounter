@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 import wowheadIcon from '../../assets/images/wowhead-icon.png';
+import Skeleton from './skeleton';
 
 class Mounts extends Component {
 
   render () {
-    const { mountDisplay } = this.props;
+    const { mountDisplay, skeleton } = this.props;
 
     return (
       <React.Fragment>
         <div className="mounts">
           <h1 className="text-4xl font-bold mb-4">Displaying {mountDisplay.length} Mounts</h1>
           <div className="grid lg:grid-cols-4 gap-12">
-            {mountDisplay.length === 0 &&
+            {skeleton &&
+              <Skeleton />
+            }
+            {!skeleton && mountDisplay.length === 0 &&
               <div className="card w-96 h-50 bg-base-100 shadow-xl image-full">
                 <figure>
-                  <div className="artboard artboard-horizontal phone-1"></div>
+                  <img src={myImg} className="object-fill" alt="Oooo Pretty" />
                 </figure>                           
                 <div className="card-body">
                   <h2 className="card-title">No Mounts Found</h2>                     

@@ -14,6 +14,7 @@ class Filters extends Component {
     classFilter: '',
     isUseable: false,
     buttonDisabled: true,
+    skeleton: true,
     mountDisplay: [],
     collectedMounts: [],
     uncollectedMounts: [],
@@ -164,7 +165,9 @@ class Filters extends Component {
     if (sourceFilter === '' && classFilter === '' && factionFilter === '') {
       this.setState({
         mountDisplay: subMountDisplay,
+        skeleton: false,
       })
+
       return;
     }
   
@@ -205,13 +208,14 @@ class Filters extends Component {
 
     this.setState({
       mountDisplay: subMountDisplay,
+      skeleton: false,
     })
     
     return;
   }
 
   render() {
-    const { mountDisplay, buttonDisabled, source, classes, isUseable } = this.state;
+    const { mountDisplay, buttonDisabled, source, classes, isUseable, skeleton } = this.state;
 
     return (
       <React.Fragment>
@@ -280,7 +284,7 @@ class Filters extends Component {
             Filter
           </button>
         </div>
-        <Mounts mountDisplay={mountDisplay} />
+        <Mounts mountDisplay={mountDisplay} skeleton={skeleton} />
       </React.Fragment>
     )
   }
