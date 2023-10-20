@@ -18,8 +18,12 @@ class CharacterExistenceChecker
     realm = character_info[:realm]
     name = character_info[:name]
 
-    character = BlizzardApi::Wow::CharacterProfile.new region: region
-    character_data = character.get(realm, name)
-    character_data.key?(:name)
+    begin
+      character = BlizzardApi::Wow::CharacterProfile.new region: region
+      character_data = character.get(realm, name)
+      character_data.key?(:name)
+    rescue
+      false
+    end
   end
 end

@@ -75,9 +75,9 @@ module Api
 
     # Call character profile from Blizzard API, format data, and return as JSON
     def profile
-      character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
-
       begin
+        character = BlizzardApi::Wow::CharacterProfile.new region: params[:region]
+
         # Call character data
         character_data = character.get(params[:realm], params[:character])
       
