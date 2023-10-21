@@ -35,11 +35,10 @@ class LoginWidget extends React.Component {
             username: '',
             password: '',
             email: '',
+          }, () => {
+            this.props.onLogin(response.characters);
           })
         }
-      })
-      .then(() => {
-        this.props.onLogin();
       })
       .catch(error => {
         console.log(error);

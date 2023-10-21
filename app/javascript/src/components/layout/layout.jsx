@@ -1,10 +1,10 @@
 // layout.js
 import React, { Component } from 'react';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
-import LoginWidget from './loginWidget';
-import SignupWidget from './signupWidget';
-import LogoutWidget from './logoutWidget';
-import Toast from './toast';
+import LoginWidget from '@comps/layout/widgets/loginWidget';
+import SignupWidget from '@comps/layout/widgets/signupWidget';
+import LogoutWidget from '@comps/layout/widgets/logoutWidget';
+import Toast from '@comps/toast/toast';
 
 class Layout extends Component {
   state = {  
@@ -37,11 +37,12 @@ class Layout extends Component {
     })
   }
 
-  handleLogin = () => {
+  handleLogin = (roster) => {
     this.setState({
       loggedIn: true,
       loginSuccess: true,
       logoutSuccess: false,
+      userRoster: roster,
     }, () => {
       this.showToast();
     })
@@ -54,6 +55,7 @@ class Layout extends Component {
       loggedIn: false,
       logoutSuccess: true,
       loginSuccess: false,
+      userRoster: [],
     }, () => {
       this.showToast();
     })
@@ -88,6 +90,7 @@ class Layout extends Component {
       })
       .then(response => {
         if (response.success) {
+          console.log(response);
           this.setState({
             userRoster: response.characters,
             loggedIn: true,
@@ -98,6 +101,28 @@ class Layout extends Component {
         this.setState({
           authError: error,
         })
+      })
+  }
+
+  deleteCharacter = (id) => {
+    fetch(`/api/characters/${id}`, safeCredentials({
+      method: 'DELETE',
+    }))
+      .then(response => {
+        if (!response.ok) {
+          throw response.json();
+        }
+        return response.json();
+      })
+      .then(response => {
+        if (response.success) {
+          this.setState({
+            userRoster: response.characters,
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error);
       })
   }
 
@@ -132,10 +157,10 @@ class Layout extends Component {
                     }
                     {userRoster.map((character) => {
                         return (
-                          <li>
-                            <p>{character.name}</p>
-                            <button className="btn btn-ghost">Delete</button>
-                            <button className="btn btn-ghost">
+                          <li key={character.id}>
+                            <p>{character.region} - {character.realm} - {character.name}</p>
+                            <button className="btn btn-ghost" onClick={() => this.deleteCharacter(character.id)}>Delete</button>
+                            <button className="btn btn-accent">
                               <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
                             </button>
                           </li>

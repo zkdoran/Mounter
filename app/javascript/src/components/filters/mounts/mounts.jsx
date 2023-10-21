@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import myImg from '../../assets/images/no-image-icon-23500.jpg';
 import wowheadIcon from '../../assets/images/wowhead-icon.png';
-import Skeleton from './skeleton';
+import Skeleton from '@comps/filters/mounts/skeleton/skeleton';
 
 class Mounts extends Component {
 
@@ -11,7 +11,9 @@ class Mounts extends Component {
     return (
       <React.Fragment>
         <div className="mounts">
-          <h1 className="text-4xl font-bold mb-4">Displaying {mountDisplay.length} Mounts</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            Displaying {mountDisplay.filter(mount => !mount.mount_detail.should_exclude_if_uncollected).length} Mounts
+          </h1>
           <div className="grid lg:grid-cols-4 gap-12">
             {skeleton &&
               <Skeleton />

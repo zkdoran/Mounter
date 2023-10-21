@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Mounts from '@src/mounts';
+import Mounts from '@comps/mounts/mounts';
 import { handleErrors } from '@utils/fetchHelper';
 
 

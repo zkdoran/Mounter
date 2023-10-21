@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import 'dotenv/config';
-import Layout from '@src/layout';
-import Filters from '@src/filters';
-import Toast from '@src/toast';
+import Layout from '@comps/layout/layout';
+import Filters from '@comps/filters/filters';
+import Toast from '@comps/toast/toast';
 
-import './home.scss';
+import '@src/home.scss';
 
 class Home extends React.Component {
   state = {
@@ -139,7 +139,6 @@ class Home extends React.Component {
       .then(response => {
         if (response.success) {
           this.setState({
-            userRoster: response.characters,
             successMessage: response.message,
           })
         }

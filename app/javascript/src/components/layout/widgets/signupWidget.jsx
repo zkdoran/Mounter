@@ -62,16 +62,14 @@ class SignupWidget extends React.Component {
       .then(response => {
         if (response.success) {
           this.setState({
-            userRoster: response.characters,
             loggedIn: true,
             username: '',
             password: '',
             email: '',
+          }, () => {
+            this.props.onLogin(response.characters);
           })
         }
-      })
-      .then(() => {
-        this.props.onLogin();
       })
       .catch(error => {
         console.log(error);
