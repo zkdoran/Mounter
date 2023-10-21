@@ -170,6 +170,17 @@ class Home extends React.Component {
       }
     })
   }
+
+  updateSelectedCharacter = (character) => {
+    console.log(character);
+    this.setState({
+      userRegion: character.region,
+      userRealm: character.realm,
+      userCharacter: character.name,
+    }, () => {
+      this.getProfile();
+    })
+  }
   
   // This function is to switch the realm list based on the user's region
   // The default is blank so there is no realm list until the user selects a region
@@ -222,7 +233,7 @@ class Home extends React.Component {
     const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster } = this.state;
     
     return (
-        <Layout userRoster={userRoster}>
+        <Layout userRoster={userRoster} updateSelectedCharacter={this.updateSelectedCharacter}>
           <div className="container mx-auto px-4">
             <div className="hero min-h-[50%] bg-base-200 py-4 mb-5">
               <div className="hero-content text-center">
