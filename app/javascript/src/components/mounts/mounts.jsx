@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import myImg from '../../assets/images/no-image-icon-23500.jpg';
-import wowheadIcon from '../../assets/images/wowhead-icon.png';
+import myImg from '@images/no-image-icon-23500.jpg';
+import wowheadIcon from '@images/wowhead-icon.png';
 import Skeleton from '@comps/skeleton/skeleton';
 
 class Mounts extends Component {
