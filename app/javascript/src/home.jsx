@@ -140,6 +140,7 @@ class Home extends React.Component {
         if (response.success) {
           this.setState({
             successMessage: response.message,
+            userRoster: response.characters,
           })
         }
       })
@@ -220,10 +221,10 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster } = this.state;
     
     return (
-        <Layout>
+        <Layout userRoster={userRoster}>
           <div className="container mx-auto px-4">
             <div className="hero min-h-[50%] bg-base-200 py-4 mb-5">
               <div className="hero-content text-center">

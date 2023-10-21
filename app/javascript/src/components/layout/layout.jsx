@@ -25,6 +25,14 @@ class Layout extends Component {
     this.authenicate();
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.userRoster !== prevProps.userRoster) {
+      this.setState({
+        userRoster: this.props.userRoster,
+      });
+    }
+  }
+  
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
@@ -90,7 +98,6 @@ class Layout extends Component {
       })
       .then(response => {
         if (response.success) {
-          console.log(response);
           this.setState({
             userRoster: response.characters,
             loggedIn: true,
