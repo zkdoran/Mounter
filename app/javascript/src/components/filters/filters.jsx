@@ -27,7 +27,6 @@ class Filters extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log('componentDidUpdate')
     if (this.props.characterData !== prevProps.characterData) {
       this.setState({
         characterData: this.props.characterData,

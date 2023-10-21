@@ -23,7 +23,6 @@ class LogoutWidget extends React.Component {
         this.props.onLogout();
       })
       .catch(error => {
-        console.log(error);
         this.setState({
           logoutError: 'Error logging out',
         })
