@@ -34,7 +34,6 @@ class Home extends React.Component {
     fetch('/api/calls/realms/')
       .then(handleErrors)
       .then(data => {
-        console.log(data)
         this.setState({
           realms: data,
         })
@@ -87,7 +86,6 @@ class Home extends React.Component {
         })
       })
       .catch(error => {
-        console.log(error)
         this.setState({
           profileError: error.error,
         }, () => {
