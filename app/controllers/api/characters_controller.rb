@@ -13,6 +13,14 @@ module Api
     
           # Check if character already exists in the database
           existing_character = Character.find_by(name: params[:character][:name], realm: params[:character][:realm], region: params[:character][:region])
+
+          # Check if character already exists in the user's roster
+          roster_check = current_user.characters.find_by(name: params[:character][:name], realm: params[:character][:realm], region: params[:character][:region])
+
+          # Return an error if the character already exists in the user's roster
+          if roster_check
+            render json: { success: false, error: "Character already exists in your roster." }, status: :unprocessable_entity
+          end
     
           if existing_character
             # Associate the existing character with the current user
