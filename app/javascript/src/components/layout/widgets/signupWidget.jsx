@@ -32,13 +32,11 @@ class SignupWidget extends React.Component {
     }))
       .then(handleErrors)
       .then(response => {
-        console.log(response);
         if (response.success) {
           this.login();
         }
       })
       .catch(error => {
-        console.log(error);
         this.setState({
           error: 'Error signing up',
         })
@@ -49,7 +47,6 @@ class SignupWidget extends React.Component {
   login = () => {
     const { username, password } = this.state;
 
-    console.log('login');
     fetch('/api/sessions', safeCredentials({
       method: 'POST',
       body: JSON.stringify({

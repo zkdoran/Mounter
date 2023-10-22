@@ -191,7 +191,6 @@ class Home extends React.Component {
 
   // Function to search for a character from the user's roster
   updateSelectedCharacter = (character) => {
-    console.log(character);
     this.setState({
       userRegion: character.region,
       userRealm: character.realm,
