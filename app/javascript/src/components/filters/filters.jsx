@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Mounts from '@comps/mounts/mounts';
 import { handleErrors } from '@utils/fetchHelper';
 
 
@@ -165,6 +164,8 @@ class Filters extends Component {
       this.setState({
         mountDisplay: subMountDisplay,
         skeleton: false,
+      }, () => {
+        this.updateHomeState();
       })
 
       return;
@@ -208,17 +209,24 @@ class Filters extends Component {
     this.setState({
       mountDisplay: subMountDisplay,
       skeleton: false,
+    }, () => {
+      this.updateHomeState();
     })
     
     return;
   }
 
+  updateHomeState = () => {
+    const { skeleton, mountDisplay } = this.state;
+    this.props.updateSkeletonAndMountDisplay(skeleton, mountDisplay);
+  }
+
   render() {
-    const { mountDisplay, buttonDisabled, source, classes, isUseable, skeleton } = this.state;
+    const { mountDisplay, buttonDisabled, source, classes, isUseable } = this.state;
 
     return (
       <React.Fragment>
-        <div className="filters dropdowns flex space-x-4 justify-center py-5">
+        <div className="filters dropdowns flex space-x-4 justify-end py-5">
           <div className="join">
             <input 
               className="join-item btn" 
@@ -246,44 +254,55 @@ class Filters extends Component {
               aria-label="Uncollected" 
             />
           </div>
-            <select className="faction select select-secondary" name="factionFilter" onChange={this.handleChange}>
-              <option value="">Select a Faction</option>
-              <option value="Alliance">Alliance</option>
-              <option value="Horde">Horde</option>
-            </select>
-            <select className="source select select-secondary" name="sourceFilter" onChange={this.handleChange}>
-              <option value="">Select a Source</option>
-              {source.map(source => {
-                return (
-                  <option key={source} value={source}>{source}</option>
-                )
-              })}
-            </select>
-            <select className="classes select select-secondary" name="classFilter" onChange={this.handleChange}>
-              <option value="">Select a Class</option>
-              {classes.map(playableClass => {
-                return (
-                  <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
-                )
-              })}
-            </select>
-          <div className="form-control">
-            <label className="cursor-pointer label">
-              <span className="label-text mr-2">Is Usable?</span>
-              <input type="checkbox"
-                name="isUseable"
-                onChange={this.handleChange} 
-                checked={isUseable}
-                disabled={buttonDisabled} 
-                className="checkbox checkbox-secondary" />
-            </label>
-          </div>
-          <button className="btn btn-primary rounded-lg" onClick={this.mountListMaker}>
-          <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"/></svg>
-            Filter
-          </button>
+          <div className="dropdown dropdown-bottom dropdown-end rounded-lg">
+            <label tabIndex={0} className="btn m-1">Filters</label>
+            <div tabIndex={0} className="dropdown-content z-50 card card-compact w-auto p-2 shadow bg-neutral text-primary-content">
+              <div className="card-body">
+                <h3 className="card-title">Filters</h3>
+                <div className="join">
+                  <select className="faction select select-secondary" name="factionFilter" onChange={this.handleChange}>
+                    <option value="">Select a Faction</option>
+                    <option value="Alliance">Alliance</option>
+                    <option value="Horde">Horde</option>
+                  </select>
+                  <select className="source select select-secondary" name="sourceFilter" onChange={this.handleChange}>
+                    <option value="">Select a Source</option>
+                    {source.map(source => {
+                      return (
+                        <option key={source} value={source}>{source}</option>
+                      )
+                    })}
+                  </select>
+                  <select className="classes select select-secondary" name="classFilter" onChange={this.handleChange}>
+                    <option value="">Select a Class</option>
+                    {classes.map(playableClass => {
+                      return (
+                        <option key={playableClass.id} value={playableClass.name}>{playableClass.name}</option>
+                      )
+                    })}
+                  </select>
+                </div>
+                <div className="flex justify-between">
+                  <div className="form-control tooltip tooltip-info" data-tip="Check if you want only mounts your character can use.">
+                    <label className="cursor-pointer label">
+                      <span className="label-text mr-2">Is Usable?</span>
+                      <input type="checkbox"
+                        name="isUseable"
+                        onChange={this.handleChange} 
+                        checked={isUseable}
+                        disabled={buttonDisabled} 
+                        className="checkbox checkbox-secondary" />
+                    </label>
+                  </div>
+                  <button className="btn btn-primary rounded-lg" onClick={this.mountListMaker}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"/></svg>
+                      Filter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>                   
         </div>
-        <Mounts mountDisplay={mountDisplay} skeleton={skeleton} />
       </React.Fragment>
     )
   }
