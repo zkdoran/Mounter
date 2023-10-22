@@ -13,7 +13,7 @@ module Api
         # Return the user's characters
         user_characters = @user.characters
 
-        render json: { success: true, characters: user_characters }, status: :created
+        render json: { success: true, characters: user_characters, username: @user.username }, status: :created
       else
         render json: { success: false }, status: :bad_request
       end
@@ -26,8 +26,9 @@ module Api
       if session
         # If the session is valid, return the user's characters
         user_characters = session.user.characters
+        username = session.user.username
 
-        render json: { success: true, characters: user_characters }, status: :ok
+        render json: { success: true, characters: user_characters, username: username }, status: :ok
       else
         render json: { success: false }, status: :unauthorized
       end

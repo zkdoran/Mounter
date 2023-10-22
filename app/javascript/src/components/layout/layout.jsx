@@ -9,8 +9,6 @@ import Toast from '@comps/toast/toast';
 class Layout extends Component {
   state = {  
     username: '',
-    password: '',
-    email: '',
     errors: {},
     loggedIn: false,
     userRoster: [],
@@ -46,12 +44,13 @@ class Layout extends Component {
     })
   }
 
-  handleLogin = (roster) => {
+  handleLogin = (roster, username) => {
     this.setState({
       loggedIn: true,
       loginSuccess: true,
       logoutSuccess: false,
       userRoster: roster,
+      username: username,
     }, () => {
       this.showToast();
     })
@@ -65,6 +64,7 @@ class Layout extends Component {
       logoutSuccess: true,
       loginSuccess: false,
       userRoster: [],
+      username: '',
     }, () => {
       this.showToast();
     })
@@ -100,6 +100,7 @@ class Layout extends Component {
       .then(response => {
         if (response.success) {
           this.setState({
+            username: response.username,
             userRoster: response.characters,
             loggedIn: true,
           })
@@ -152,7 +153,10 @@ class Layout extends Component {
           {loggedIn ?
             <div className="flex justify-end flex-1 px-2">
               <div className="flex items-stretch">
-                <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log Out</button>
+                <h3 className="italic flex items-center">
+                  Welcome, {this.state.username}!
+                </h3>
+                <button className="btn btn-ghost ms-3" onClick={()=>document.getElementById('my_modal_3').showModal()}>Log Out</button>
                 <dialog id="my_modal_3" className="modal">
                   <div className="modal-box flex flex-col items-center justify-center rounded-lg">
                     <form method="dialog">

@@ -31,12 +31,13 @@ class LoginWidget extends React.Component {
       .then(handleErrors)
       .then(response => {
         if (response.success) {
+          let temp = username;
           this.setState({
             username: '',
             password: '',
             email: '',
           }, () => {
-            this.props.onLogin(response.characters);
+            this.props.onLogin(response.characters, temp);
           })
         }
       })
