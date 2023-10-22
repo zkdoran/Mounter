@@ -246,12 +246,12 @@ class Filters extends Component {
               aria-label="Uncollected" 
             />
           </div>
-            <select className="faction select select-accent" name="factionFilter" onChange={this.handleChange}>
+            <select className="faction select select-secondary" name="factionFilter" onChange={this.handleChange}>
               <option value="">Select a Faction</option>
               <option value="Alliance">Alliance</option>
               <option value="Horde">Horde</option>
             </select>
-            <select className="source select select-accent" name="sourceFilter" onChange={this.handleChange}>
+            <select className="source select select-secondary" name="sourceFilter" onChange={this.handleChange}>
               <option value="">Select a Source</option>
               {source.map(source => {
                 return (
@@ -259,7 +259,7 @@ class Filters extends Component {
                 )
               })}
             </select>
-            <select className="classes select select-accent" name="classFilter" onChange={this.handleChange}>
+            <select className="classes select select-secondary" name="classFilter" onChange={this.handleChange}>
               <option value="">Select a Class</option>
               {classes.map(playableClass => {
                 return (
@@ -275,7 +275,7 @@ class Filters extends Component {
                 onChange={this.handleChange} 
                 checked={isUseable}
                 disabled={buttonDisabled} 
-                className="checkbox checkbox-accent" />
+                className="checkbox checkbox-secondary" />
             </label>
           </div>
           <button className="btn btn-primary rounded-lg" onClick={this.mountListMaker}>
