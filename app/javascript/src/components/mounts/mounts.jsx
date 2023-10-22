@@ -10,7 +10,7 @@ class Mounts extends Component {
 
     return (
       <React.Fragment>
-        <div className="mounts">
+        <div className="mounts mb-5">
           <h1 className="text-4xl font-bold mb-4">
             Displaying {mountDisplay.filter(mount => !mount.mount_detail.should_exclude_if_uncollected).length} Mounts
           </h1>
