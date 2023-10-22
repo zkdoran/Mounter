@@ -33,6 +33,7 @@ class LogoutWidget extends React.Component {
     const { logoutError } = this.state;
     return (
       <React.Fragment>
+        <h1 className="text-2xl font-bold mb-4">Log Out</h1>
         <p className="mb-4">Are you sure you want to log out?</p>
         <button className="btn btn-active btn-error mb-4" onClick={this.endSession}>Log Out</button>
         {logoutError && 
