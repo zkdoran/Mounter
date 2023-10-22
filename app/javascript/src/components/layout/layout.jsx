@@ -144,7 +144,7 @@ class Layout extends Component {
       <React.Fragment>
         <div className="navbar bg-secondary-content rounded-box">
           <div className="flex-1 px-2 lg:flex-none">
-            <a className="text-lg font-bold">Mounter</a>
+            <a href="/" className="text-lg font-bold">Mounter</a>
           </div>
           {loggedIn ?
             <div className="flex justify-end flex-1 px-2">
@@ -158,9 +158,9 @@ class Layout extends Component {
                     <LogoutWidget onLogout={this.handleLogout} />
                   </div>
                 </dialog>
-                <div className="dropdown dropdown-end">
+                <div className="dropdown dropdown-bottom dropdown-end">
                   <label tabIndex={0} className="btn btn-ghost rounded-btn">Roster</label>
-                  <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-300 rounded-box w-52 mt-4">
+                  <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-300 rounded-box w-auto mt-4">
                     {userRoster.length === 0 &&
                       <li>
                         <p>No characters added</p>
@@ -168,18 +168,27 @@ class Layout extends Component {
                     }
                     {userRoster.map((character) => {
                         return (
-                          <li key={character.id} className="flex items-center justify-between">
-                            <p>
-                              <span>{character.region} - {character.realm} - {character.name}</span>
+                          <li key={character.id} className="flex items-end justify-between">
+                            <div className="flex">
                               <span>
-                                <button className="btn btn-success btn-xs mb-2" onClick={() => this.props.updateSelectedCharacter(character)}>
-                                  Search
-                                </button>
-                                <button className="btn btn-warning btn-xs" onClick={() => this.deleteCharacter(character.id)}>
-                                  Delete
-                                </button>      
+                                {character.region.toUpperCase()}
                               </span>
-                            </p>
+                              <span>
+                                -
+                              </span>
+                              <span>
+                                 {character.realm.charAt(0).toUpperCase() + character.realm.slice(1)}:
+                              </span>
+                              <span>
+                                {character.name.charAt(0).toUpperCase() + character.name.slice(1)}
+                              </span>
+                              <button className="btn btn-primary btn-xs" onClick={() => this.props.updateSelectedCharacter(character)}>
+                                Search
+                              </button>
+                              <button className="btn btn-secondary btn-xs" onClick={() => this.deleteCharacter(character.id)}>
+                                Delete
+                              </button>
+                            </div>
                           </li>
                         )
                       }
