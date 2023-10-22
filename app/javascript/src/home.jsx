@@ -23,6 +23,11 @@ class Home extends React.Component {
     profileSuccess: false,
     characterSuccess: false,
     successMessage: '',
+    loadedCharacter: {
+      region: '',
+      realm: '',
+      name: '',
+    },
   }
 
   componentDidMount() {
@@ -76,13 +81,24 @@ class Home extends React.Component {
         this.setState({
           characterData: data,
           successMessage: "Character found!",
+          loadedCharacter: {
+            region: userRegion,
+            realm: userRealm,
+            name: userCharacter,
+          }
         })
       })
       .then(() => {
         this.setState({
           profileSuccess: true,
+          userRegion: '',
+          userRealm: '',
+          userCharacter: '',
         }, () => {
           this.showToast();
+          document.getElementById("userRegion").value = ""; // Reset the select input
+          document.getElementById("userRealm").value = "";  // Reset the select input
+          document.getElementById("userCharacter").value = "";  // Reset the select input
         })
       })
       .catch(error => {
@@ -171,6 +187,7 @@ class Home extends React.Component {
     })
   }
 
+  // Function to search for a character from the user's roster
   updateSelectedCharacter = (character) => {
     console.log(character);
     this.setState({
@@ -230,7 +247,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster, loadedCharacter } = this.state;
     
     return (
         <Layout userRoster={userRoster} updateSelectedCharacter={this.updateSelectedCharacter}>
@@ -239,28 +256,28 @@ class Home extends React.Component {
               <div className="hero-content text-center">
                 <div className="max-w-md">
                   <h1 className="text-5xl font-bold">Welcome to Mounter!</h1>
-                  <p className="py-6">A World of Warcraft® mount finder and filter site.</p>
+                  <p className="py-6">World of Warcraft® mount finder and filter site.</p>
                 </div>
               </div>
             </div>
             <div className="dropdowns flex space-x-4 justify-center py-5">
-              <select className="region select select-accent" name="userRegion" onChange={this.handleChange}>
-                <option>Select a Region</option>
+              <select id="userRegion" className="region select select-accent" name="userRegion" onChange={this.handleChange}>
+                <option value="">Select a Region</option>
                 {region.map(region => {
                   return (
                     <option key={region} value={region}>{region.toUpperCase()}</option>
                   )
                 })}
               </select>
-              <select className="realm select select-accent w-44" name="userRealm" onChange={this.handleChange}>
-                <option>Select a Realm</option>
+              <select id="userRealm" className="realm select select-accent w-44" name="userRealm" onChange={this.handleChange}>
+                <option value="">Select a Realm</option>
                 {realmList.map(realm => {
                   return (
                     <option key={realm.id} value={realm.slug}>{realm.name}</option>
                   )
                 })}
               </select>
-              <input type="text" placeholder="Character Name" className="input input-bordered input-accent w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
+              <input id="userCharacter" type="text" placeholder="Character Name" className="input input-bordered input-accent w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
               <button className="btn btn-primary rounded-lg" onClick={this.getProfile}>
                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>  
                 Search
@@ -278,6 +295,16 @@ class Home extends React.Component {
             )}
             {characterSuccess && showToast && (
               <Toast message={successMessage} type="success" />
+            )}
+            {profileSuccess && showToast && (
+              <div className="toast toast-start z-50">
+                <div className="alert alert-info">
+                  <span>Character Loaded</span>
+                  <span>Region: {loadedCharacter.region.toUpperCase()}</span>
+                  <span>Realm: {loadedCharacter.realm.charAt(0).toUpperCase() + loadedCharacter.realm.slice(1)}</span>
+                  <span>Name: {loadedCharacter.name.charAt(0).toUpperCase() + loadedCharacter.name.slice(1)}</span>
+                </div>
+              </div>
             )}
             <div className="divider"></div>
             <Filters characterData={characterData} />
