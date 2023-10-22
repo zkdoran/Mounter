@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
-import 'dotenv/config';
 import Layout from '@comps/layout/layout';
 import Filters from '@comps/filters/filters';
 import Toast from '@comps/toast/toast';
+import Mounts from '@comps/mounts/mounts';
 
 import '@src/home.scss';
 
@@ -28,6 +28,8 @@ class Home extends React.Component {
       realm: '',
       name: '',
     },
+    mountDisplay: [],
+    skeleton: true,
   }
 
   componentDidMount() {
@@ -198,6 +200,13 @@ class Home extends React.Component {
       this.getProfile();
     })
   }
+
+  updateSkeletonAndMountDisplay = (skeleton, mountDisplay) => {
+    this.setState({
+      skeleton: skeleton,
+      mountDisplay: mountDisplay,
+    })
+  }
   
   // This function is to switch the realm list based on the user's region
   // The default is blank so there is no realm list until the user selects a region
@@ -246,8 +255,12 @@ class Home extends React.Component {
     })
   }
 
+  scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   render() {
-    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster, loadedCharacter } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster, loadedCharacter, mountDisplay, skeleton } = this.state;
     
     return (
         <Layout userRoster={userRoster} updateSelectedCharacter={this.updateSelectedCharacter}>
@@ -260,55 +273,80 @@ class Home extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="dropdowns flex space-x-4 justify-center py-5">
-              <select id="userRegion" className="region select select-secondary" name="userRegion" onChange={this.handleChange}>
-                <option value="">Select a Region</option>
-                {region.map(region => {
-                  return (
-                    <option key={region} value={region}>{region.toUpperCase()}</option>
-                  )
-                })}
-              </select>
-              <select id="userRealm" className="realm select select-secondary w-44" name="userRealm" onChange={this.handleChange}>
-                <option value="">Select a Realm</option>
-                {realmList.map(realm => {
-                  return (
-                    <option key={realm.id} value={realm.slug}>{realm.name}</option>
-                  )
-                })}
-              </select>
-              <input id="userCharacter" type="text" placeholder="Character Name" className="input input-bordered input-secondary w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
-              <button className="btn btn-primary rounded-lg" onClick={this.getProfile}>
-                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>  
-                Search
-              </button>
-              <button className="btn btn-secondary rounded-lg" onClick={this.addCharacter}>Add to Roster</button>
-            </div>
-            {profileError !== "" && showToast && (
-              <Toast message={profileError} type="error" />
-            )}
-            {profileSuccess && showToast && (
-              <Toast message={successMessage} type="success" />
-            )}
-            {characterError !== "" && showToast && (
-              <Toast message={characterError} type="error" />
-            )}
-            {characterSuccess && showToast && (
-              <Toast message={successMessage} type="success" />
-            )}
-            {profileSuccess && showToast && (
-              <div className="toast toast-start z-50">
-                <div className="alert alert-info">
-                  <span>Character Loaded</span>
-                  <span>Region: {loadedCharacter.region.toUpperCase()}</span>
-                  <span>Realm: {loadedCharacter.realm.charAt(0).toUpperCase() + loadedCharacter.realm.slice(1)}</span>
-                  <span>Name: {loadedCharacter.name.charAt(0).toUpperCase() + loadedCharacter.name.slice(1)}</span>
+            <div className="flex space-x-4 justify-between py-5">
+              <div className="dropdowns flex space-x-4 justify-start py-5">
+                <div className="join">
+                  <select id="userRegion" className="region select select-secondary" name="userRegion" onChange={this.handleChange}>
+                    <option value="">Select a Region</option>
+                    {region.map(region => {
+                      return (
+                        <option key={region} value={region}>{region.toUpperCase()}</option>
+                      )
+                    })}
+                  </select>
+                  <select id="userRealm" className="realm select select-secondary w-44" name="userRealm" onChange={this.handleChange}>
+                    <option value="">Select a Realm</option>
+                    {realmList.map(realm => {
+                      return (
+                        <option key={realm.id} value={realm.slug}>{realm.name}</option>
+                      )
+                    })}
+                  </select>
+                  <input id="userCharacter" type="text" placeholder="Character Name" className="input input-bordered input-secondary w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
                 </div>
-              </div>
-            )}
-            <div className="divider"></div>
-            <Filters characterData={characterData} />
+                <button className="btn btn-primary rounded-lg" onClick={this.getProfile}>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>  
+                  Search
+                </button>
+                <button className="btn btn-secondary rounded-lg" onClick={this.addCharacter}>Add to Roster</button>
+              </div>           
+              <div className="divider divider-horizontal"></div>
+              <Filters characterData={characterData} updateSkeletonAndMountDisplay={this.updateSkeletonAndMountDisplay} />
+            </div>
+            <Mounts mountDisplay={mountDisplay} skeleton={skeleton} />
           </div>
+          {profileError !== "" && showToast && (
+            <Toast message={profileError} type="error" />
+          )}
+          {profileSuccess && showToast && (
+            <Toast message={successMessage} type="success" />
+          )}
+          {characterError !== "" && showToast && (
+            <Toast message={characterError} type="error" />
+          )}
+          {characterSuccess && showToast && (
+            <Toast message={successMessage} type="success" />
+          )}
+          {profileSuccess && showToast && (
+            <div className="toast toast-start z-50">
+              <div className="alert alert-info">
+                <span>Character Loaded</span>
+                <span>Region: {loadedCharacter.region.toUpperCase()}</span>
+                <span>Realm: {loadedCharacter.realm.charAt(0).toUpperCase() + loadedCharacter.realm.slice(1)}</span>
+                <span>Name: {loadedCharacter.name.charAt(0).toUpperCase() + loadedCharacter.name.slice(1)}</span>
+              </div>
+            </div>
+          )}
+          <button
+            ref={this.scrollToTopButtonRef}
+            className="fixed bottom-4 right-4 p-2 bg-secondary text-white rounded-full cursor-pointer hover:bg-blue-600"
+            onClick={this.scrollToTop}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 10l7-7m0 0l7 7m-7-7v18"
+              />
+            </svg>
+          </button>
         </Layout>
     )
   }
