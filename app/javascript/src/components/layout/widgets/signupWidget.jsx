@@ -32,11 +32,13 @@ class SignupWidget extends React.Component {
     }))
       .then(handleErrors)
       .then(response => {
+        console.log(response);
         if (response.success) {
           this.login();
         }
       })
       .catch(error => {
+        console.log(error);
         this.setState({
           error: 'Error signing up',
         })
@@ -44,10 +46,10 @@ class SignupWidget extends React.Component {
   }
 
   // Login call
-  login = (e) => {
+  login = () => {
     const { username, password } = this.state;
-    e.preventDefault();
 
+    console.log('login');
     fetch('/api/sessions', safeCredentials({
       method: 'POST',
       body: JSON.stringify({
@@ -117,7 +119,7 @@ class SignupWidget extends React.Component {
               required
             />
           </div>
-          <button type="submit" className="btn btn-active btn-primary w-full mt-4">Login</button>
+          <button type="submit" className="btn btn-active btn-primary w-full mt-4">Sign Up</button>
           {error && 
             <div className="alert alert-error mt-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
