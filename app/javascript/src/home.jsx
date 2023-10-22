@@ -329,7 +329,7 @@ class Home extends React.Component {
           )}
           <button
             ref={this.scrollToTopButtonRef}
-            className="fixed bottom-4 right-4 p-2 bg-secondary text-white rounded-full cursor-pointer hover:bg-blue-600"
+            className="fixed bottom-12 right-4 p-2 bg-secondary text-white rounded-full cursor-pointer hover:bg-blue-600"
             onClick={this.scrollToTop}
           >
             <svg
