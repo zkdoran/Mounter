@@ -73,55 +73,55 @@ module Api
     # end
 
     # Call mounts from Blizzard API, format data, and return as JSON
-    def mounts
-      self.class.send(:include, ActionController::Live)
+    # def mounts
+    #   self.class.send(:include, ActionController::Live)
 
-      response.headers['Content-Type'] = 'text/event-stream'
-      sse = SSE.new(response.stream)
+    #   response.headers['Content-Type'] = 'text/event-stream'
+    #   sse = SSE.new(response.stream)
 
-      begin
-        begin
-          mount_index = BlizzardApi::Wow::Mount.new.index
-        rescue BlizzardApi::ApiException => e
-          Rails.logger.error("Failed to get mount index: #{e.code} #{e.message} #{e.response_body}")
-          render json: { success: false, error: "Failed to get mount index.", code: e.code }, status: :internal_server_error
-          return
-        end
+    #   begin
+    #     begin
+    #       mount_index = BlizzardApi::Wow::Mount.new.index
+    #     rescue BlizzardApi::ApiException => e
+    #       Rails.logger.error("Failed to get mount index: #{e.code} #{e.message} #{e.response_body}")
+    #       render json: { success: false, error: "Failed to get mount index.", code: e.code }, status: :internal_server_error
+    #       return
+    #     end
 
-        formatted_mount = []
+    #     formatted_mount = []
 
-       # sse.write('[')
+    #    # sse.write('[')
 
-        first = true
+    #     first = true
 
-        # Call mount details for each mount, loops through 1k+ mounts
-        mount_index[:mounts].each do |mount|
+    #     # Call mount details for each mount, loops through 1k+ mounts
+    #     mount_index[:mounts].each do |mount|
          
-          begin
-            mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
-          rescue BlizzardApi::ApiException => e
-            Rails.logger.error("Failed to fetch mount details for mount ID #{mount[:id]}: #{e.message}")
-            next
-          end
+    #       begin
+    #         mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+    #       rescue BlizzardApi::ApiException => e
+    #         Rails.logger.error("Failed to fetch mount details for mount ID #{mount[:id]}: #{e.message}")
+    #         next
+    #       end
 
-          formatted_mount = format_mount(mount)
+    #       formatted_mount = format_mount(mount)
 
-          # if first
-          #   first = false
-          # else
-          #   sse.write(',')
-          # end
+    #       # if first
+    #       #   first = false
+    #       # else
+    #       #   sse.write(',')
+    #       # end
 
-          sse.write(formatted_mount.to_json)
-        end
+    #       sse.write(formatted_mount.to_json)
+    #     end
 
-       # sse.write('],')
-        sse.write('{"endOfStream": true}')
-        sse.close
-      ensure
-        sse.close
-      end
-    end
+    #    # sse.write('],')
+    #     sse.write('{"endOfStream": true}')
+    #     sse.close
+    #   ensure
+    #     sse.close
+    #   end
+    # end
 
     # Call character profile from Blizzard API, format data, and return as JSON
     def profile
@@ -212,42 +212,42 @@ module Api
     # end
 
     # Format data from Blizzard API
-    def format_mount(mount)  
-        mount[:name] = mount[:name][:en_US]        
-        mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
+    # def format_mount(mount)  
+    #     mount[:name] = mount[:name][:en_US]        
+    #     mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
         
-        # Some mounts don't have a faction, source, or requirements, so check if they exist before formatting
-        if mount[:mount_detail][:faction]
-          mount[:mount_detail][:faction] = mount[:mount_detail][:faction][:name][:en_US]
-        end
+    #     # Some mounts don't have a faction, source, or requirements, so check if they exist before formatting
+    #     if mount[:mount_detail][:faction]
+    #       mount[:mount_detail][:faction] = mount[:mount_detail][:faction][:name][:en_US]
+    #     end
 
-        if mount[:mount_detail][:source]
-          mount[:mount_detail][:source] = mount[:mount_detail][:source][:name][:en_US]
-        end
+    #     if mount[:mount_detail][:source]
+    #       mount[:mount_detail][:source] = mount[:mount_detail][:source][:name][:en_US]
+    #     end
 
-        if mount[:mount_detail][:requirements]
-          # Some mounts have multiple requirements, so check if they exist before formatting
-          if mount[:mount_detail][:requirements][:faction]
-            mount[:mount_detail][:requirements][:faction] = mount[:mount_detail][:requirements][:faction][:name][:en_US]
-          end
+    #     if mount[:mount_detail][:requirements]
+    #       # Some mounts have multiple requirements, so check if they exist before formatting
+    #       if mount[:mount_detail][:requirements][:faction]
+    #         mount[:mount_detail][:requirements][:faction] = mount[:mount_detail][:requirements][:faction][:name][:en_US]
+    #       end
 
-          if mount[:mount_detail][:requirements][:classes]
-            mount[:mount_detail][:requirements][:classes] = mount[:mount_detail][:requirements][:classes][0][:name][:en_US]
-          end
+    #       if mount[:mount_detail][:requirements][:classes]
+    #         mount[:mount_detail][:requirements][:classes] = mount[:mount_detail][:requirements][:classes][0][:name][:en_US]
+    #       end
 
-          if mount[:mount_detail][:requirements][:races]
-            mount[:mount_detail][:requirements][:races] = mount[:mount_detail][:requirements][:races][0][:name][:en_US]
-          end 
-        end
+    #       if mount[:mount_detail][:requirements][:races]
+    #         mount[:mount_detail][:requirements][:races] = mount[:mount_detail][:requirements][:races][0][:name][:en_US]
+    #       end 
+    #     end
 
-        mount.delete(:key)
-        mount[:mount_detail].delete(:_links)
-        mount[:mount_detail].delete(:name)
-        mount[:mount_detail].delete(:id)
-        mount[:mount_detail].delete(:description)
+    #     mount.delete(:key)
+    #     mount[:mount_detail].delete(:_links)
+    #     mount[:mount_detail].delete(:name)
+    #     mount[:mount_detail].delete(:id)
+    #     mount[:mount_detail].delete(:description)
         
-        return mount
-    end
+    #     return mount
+    # end
 
     # Character data has a lot of data I don't need, so I'm only formatting the data I need and making a new hash
     def format_characters(data)

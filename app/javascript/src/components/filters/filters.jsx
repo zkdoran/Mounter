@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { handleErrors } from '@utils/fetchHelper';
+import { mounts } from '@utils/mounts';
 
 
 class Filters extends Component {
   state = {
-    mounts: [],
     classes: [],
     characterData: {},
     listChoice: '',
@@ -21,7 +21,7 @@ class Filters extends Component {
   }
 
   componentDidMount() {
-    this.getMounts();
+    this.mountListMaker();
     this.getClasses();
   }
 
@@ -50,31 +50,31 @@ class Filters extends Component {
   // }
 
   // This function is to get the mounts for the mount list
-  getMounts = () => {
-    const eventSource = new EventSource('/api/calls/mounts');
-    const mounts = [];
+  // getMounts = () => {
+  //   const eventSource = new EventSource('/api/calls/mounts');
+  //   const mounts = [];
 
-    eventSource.onmessage = (event) => {
-      const mountData = JSON.parse(event.data);
+  //   eventSource.onmessage = (event) => {
+  //     const mountData = JSON.parse(event.data);
 
-      if (mountData.endOfStream) {
-        eventSource.close(); // Close the EventSource
+  //     if (mountData.endOfStream) {
+  //       eventSource.close(); // Close the EventSource
 
-        this.setState({
-          mounts: mounts,
-        }, () => {
-          this.mountListMaker();
-        })        
-      } else {
-        mounts.push(mountData);
-      }
-    };
+  //       this.setState({
+  //         mounts: mounts,
+  //       }, () => {
+  //         this.mountListMaker();
+  //       })        
+  //     } else {
+  //       mounts.push(mountData);
+  //     }
+  //   };
 
-    eventSource.onerror = (error) => {
-      console.error("EventSource failed:", error);
-      eventSource.close();
-    };
-  };
+  //   eventSource.onerror = (error) => {
+  //     console.error("EventSource failed:", error);
+  //     eventSource.close();
+  //   };
+  // };
 
   // This function is to get the playable classes for the classes list
   getClasses = () => {
@@ -107,7 +107,7 @@ class Filters extends Component {
 
   // This function is to split the mounts into two additional lists: collected and uncollected
   mountListSplit = () => {
-    const { characterData, mounts } = this.state;
+    const { characterData } = this.state;
     const characterMounts = characterData.mounts.map(mount => mount.id);
   
     const collectedMounts = mounts.filter(mount => characterMounts.includes(mount.id));
@@ -134,7 +134,7 @@ class Filters extends Component {
   // I combined both the filter and list switch into one function since I wanted to reduce setState calls
   // I was having issues with state syncing up with the DOM, so I decided to combine them into one function
   mountListMaker = () => {
-    const { mounts, collectedMounts, uncollectedMounts, listChoice, sourceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
+    const { collectedMounts, uncollectedMounts, listChoice, sourceFilter, classFilter, factionFilter, isUseable, characterData } = this.state;
     let subMountDisplay = [];
 
     // If no listChoice is selected, default to all
