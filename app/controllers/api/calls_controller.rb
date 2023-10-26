@@ -59,18 +59,55 @@ module Api
       render json: class_data[:classes], status: :ok
     end
 
+    # def mounts
+    #   mount_index = BlizzardApi::Wow::Mount.new.index
+
+    #   # Call mount details for each mount, loops through 1k+ mounts
+    #   mount_index[:mounts].each do |mount|
+    #     mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+    #   end
+
+    #   format_mounts(mount_index)
+
+    #   render json: mount_index[:mounts], status: :ok
+    # end
+
     # Call mounts from Blizzard API, format data, and return as JSON
     def mounts
-      mount_index = BlizzardApi::Wow::Mount.new.index
+      self.class.send(:include, ActionController::Live)
 
-      # Call mount details for each mount, loops through 1k+ mounts
-      mount_index[:mounts].each do |mount|
-        mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+      response.headers['Content-Type'] = 'text/event-stream'
+      sse = SSE.new(response.stream)
+
+      begin
+        mount_index = BlizzardApi::Wow::Mount.new.index
+        formatted_mount = []
+
+       # sse.write('[')
+
+        first = true
+
+        # Call mount details for each mount, loops through 1k+ mounts
+        mount_index[:mounts].each do |mount|
+          mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+
+          formatted_mount = format_mount(mount)
+
+          # if first
+          #   first = false
+          # else
+          #   sse.write(',')
+          # end
+
+          sse.write(formatted_mount.to_json)
+        end
+
+       # sse.write('],')
+        sse.write('{"endOfStream": true}')
+        sse.close
+      ensure
+        sse.close
       end
-
-      format_mounts(mount_index)
-
-      render json: mount_index[:mounts], status: :ok
     end
 
     # Call character profile from Blizzard API, format data, and return as JSON
@@ -124,11 +161,46 @@ module Api
       data[:races].delete_if { |race| race[:id] == 70 }
     end
 
+    # def format_mounts(data)
+    #   data[:mounts].each do |mount|
+    #     mount[:name] = mount[:name][:en_US]
+    #     mount.delete(:key)
+    #     mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
+        
+    #     # Some mounts don't have a faction, source, or requirements, so check if they exist before formatting
+    #     if mount[:mount_detail][:faction]
+    #       mount[:mount_detail][:faction] = mount[:mount_detail][:faction][:name][:en_US]
+    #     end
+
+    #     if mount[:mount_detail][:source]
+    #       mount[:mount_detail][:source] = mount[:mount_detail][:source][:name][:en_US]
+    #     end
+
+    #     if mount[:mount_detail][:requirements]
+    #       # Some mounts have multiple requirements, so check if they exist before formatting
+    #       if mount[:mount_detail][:requirements][:faction]
+    #         mount[:mount_detail][:requirements][:faction] = mount[:mount_detail][:requirements][:faction][:name][:en_US]
+    #       end
+
+    #       if mount[:mount_detail][:requirements][:classes]
+    #         mount[:mount_detail][:requirements][:classes] = mount[:mount_detail][:requirements][:classes][0][:name][:en_US]
+    #       end
+
+    #       if mount[:mount_detail][:requirements][:races]
+    #         mount[:mount_detail][:requirements][:races] = mount[:mount_detail][:requirements][:races][0][:name][:en_US]
+    #       end 
+    #     end
+       
+    #     mount[:mount_detail].delete(:_links)
+    #     mount[:mount_detail].delete(:name)
+    #     mount[:mount_detail].delete(:id)
+    #     mount[:mount_detail].delete(:description)
+    #   end
+    # end
+
     # Format data from Blizzard API
-    def format_mounts(data)
-      data[:mounts].each do |mount|
-        mount[:name] = mount[:name][:en_US]
-        mount.delete(:key)
+    def format_mount(mount)  
+        mount[:name] = mount[:name][:en_US]        
         mount[:mount_detail][:creature_displays] = mount[:mount_detail][:creature_displays][0][:id]
         
         # Some mounts don't have a faction, source, or requirements, so check if they exist before formatting
@@ -154,12 +226,14 @@ module Api
             mount[:mount_detail][:requirements][:races] = mount[:mount_detail][:requirements][:races][0][:name][:en_US]
           end 
         end
-       
+
+        mount.delete(:key)
         mount[:mount_detail].delete(:_links)
         mount[:mount_detail].delete(:name)
         mount[:mount_detail].delete(:id)
         mount[:mount_detail].delete(:description)
-      end
+        
+        return mount
     end
 
     # Character data has a lot of data I don't need, so I'm only formatting the data I need and making a new hash

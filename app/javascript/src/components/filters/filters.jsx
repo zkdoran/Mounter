@@ -35,19 +35,46 @@ class Filters extends Component {
     })}
   }
 
+  // getMounts = () => {
+  //   fetch('/api/calls/mounts')
+  //     .then(handleErrors)
+  //     .then(data => {
+  //       console.log(data);
+  //       this.setState({
+  //         mounts: data,
+  //       })
+  //     })
+  //     .then(() => {
+  //       this.mountListMaker()
+  //     })
+  // }
+
   // This function is to get the mounts for the mount list
   getMounts = () => {
-    fetch('/api/calls/mounts')
-      .then(handleErrors)
-      .then(data => {
+    const eventSource = new EventSource('/api/calls/mounts');
+    const mounts = [];
+
+    eventSource.onmessage = (event) => {
+      const mountData = JSON.parse(event.data);
+
+      if (mountData.endOfStream) {
+        eventSource.close(); // Close the EventSource
+
         this.setState({
-          mounts: data,
-        })
-      })
-      .then(() => {
-        this.mountListMaker()
-      })
-  }
+          mounts: mounts,
+        }, () => {
+          this.mountListMaker();
+        })        
+      } else {
+        mounts.push(mountData);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+      eventSource.close();
+    };
+  };
 
   // This function is to get the playable classes for the classes list
   getClasses = () => {
