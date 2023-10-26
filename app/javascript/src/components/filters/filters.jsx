@@ -258,7 +258,8 @@ class Filters extends Component {
             <input 
               className="join-item btn" 
               onChange={this.handleChange} 
-              type="radio" name="listChoice" 
+              type="radio" 
+              name="listChoice" 
               value="all" 
               aria-label="All" 
             />
