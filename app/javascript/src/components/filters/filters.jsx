@@ -27,6 +27,7 @@ class Filters extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.characterData !== prevProps.characterData) {
+      console.log('filters component updated: ', this.props.characterData )
       this.setState({
         characterData: this.props.characterData,
         buttonDisabled: false,
@@ -126,9 +127,9 @@ class Filters extends Component {
     this.setState({
       collectedMounts: updatedCollectedMounts,
       uncollectedMounts: uncollectedMounts,
-    });
-  
-    this.mountListMaker();
+    }, () => {
+      this.mountListMaker();
+    })
   }
 
   // I combined both the filter and list switch into one function since I wanted to reduce setState calls
