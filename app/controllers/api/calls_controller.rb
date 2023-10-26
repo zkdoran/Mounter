@@ -80,7 +80,14 @@ module Api
       sse = SSE.new(response.stream)
 
       begin
-        mount_index = BlizzardApi::Wow::Mount.new.index
+        begin
+          mount_index = BlizzardApi::Wow::Mount.new.index
+        rescue BlizzardApi::ApiException => e
+          Rails.logger.error("Failed to get mount index: #{e.code} #{e.message} #{e.response_body}")
+          render json: { success: false, error: "Failed to get mount index.", code: e.code }, status: :internal_server_error
+          return
+        end
+
         formatted_mount = []
 
        # sse.write('[')
@@ -89,7 +96,13 @@ module Api
 
         # Call mount details for each mount, loops through 1k+ mounts
         mount_index[:mounts].each do |mount|
-          mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+         
+          begin
+            mount[:mount_detail] = BlizzardApi::Wow.mount.get(mount[:id])
+          rescue BlizzardApi::ApiException => e
+            Rails.logger.error("Failed to fetch mount details for mount ID #{mount[:id]}: #{e.message}")
+            next
+          end
 
           formatted_mount = format_mount(mount)
 
