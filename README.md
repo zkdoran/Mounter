@@ -146,3 +146,27 @@ This call also works fine locally. In fact both of these calls locally take roug
 So since neither call worked I just got the array locally and then throw it as a [variable into the code](https://github.com/AtomicCow87/Mounter/blob/main/app/javascript/src/utils/mounts.js).
 
 The correct way I believe to fix this issue is to learn and implement `Workers` on Heroku that will run that mount call separate from the app and just keep the data available in `Redis` on the back-end. Then I just do the normal front-end call and the back-end just serves the data the `Worker` got independently.
+
+# License
+
+MIT License
+
+Copyright (c) 2023 AtomicCow87
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
