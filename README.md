@@ -20,6 +20,7 @@ There are 1104 mounts in the game. Not all are collectible, but the vast majorit
 ![Untitled-2023-10-26-2042](https://github.com/AtomicCow87/Mounter/assets/16769807/36a9d4d0-1a59-4030-8865-3cab0d35eaec)
 
 * 1 - You can sign up so you can use the Add to Roster button, and that will make future searching for the same character faster.
+  
 ![roster](https://github.com/AtomicCow87/Mounter/assets/16769807/2f580945-b7ab-436a-b668-c7c9b40c53a5)
 
 * 2 - Select a Region then a Realm, then input a character name and click search. If you did 1 you can click Add to Roster instead of Search.
