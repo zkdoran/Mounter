@@ -73,6 +73,7 @@ Download or Fork the repo.
 BLIZZARD_CLIENT_ID=<Your Key>
 BLIZZARD_CLIENT_SECRET=<Your Key>
 ```
+*Remember to add .env to .gitignore*
 
 `foreman start -f Procfile.dev` in your command line of choice.
 
