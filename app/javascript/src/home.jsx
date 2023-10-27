@@ -30,6 +30,7 @@ class Home extends React.Component {
     },
     mountDisplay: [],
     skeleton: true,
+    disableSearches: true,
   }
 
   componentDidMount() {
@@ -43,6 +44,7 @@ class Home extends React.Component {
       .then(data => {
         this.setState({
           realms: data,
+          disableSearches: false,
         })
       })
   }
@@ -259,7 +261,7 @@ class Home extends React.Component {
   };
 
   render() {
-    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster, loadedCharacter, mountDisplay, skeleton } = this.state;
+    const { region, characterData, realmList, profileSuccess, profileError, characterSuccess, characterError, showToast, successMessage, userRoster, loadedCharacter, mountDisplay, skeleton, disableSearches } = this.state;
     
     return (
         <Layout userRoster={userRoster} updateSelectedCharacter={this.updateSelectedCharacter}>
@@ -275,7 +277,7 @@ class Home extends React.Component {
             <div className="flex space-x-4 justify-between py-5">
               <div className="dropdowns flex space-x-4 justify-start py-5">
                 <div className="join">
-                  <select id="userRegion" className="region select select-secondary" name="userRegion" onChange={this.handleChange}>
+                  <select id="userRegion" className="region select select-secondary" name="userRegion" onChange={this.handleChange} disabled={disableSearches}>
                     <option value="">Select a Region</option>
                     {region.map(region => {
                       return (
@@ -283,7 +285,7 @@ class Home extends React.Component {
                       )
                     })}
                   </select>
-                  <select id="userRealm" className="realm select select-secondary w-44" name="userRealm" onChange={this.handleChange}>
+                  <select id="userRealm" className="realm select select-secondary w-44" name="userRealm" onChange={this.handleChange} disabled={disableSearches}>
                     <option value="">Select a Realm</option>
                     {realmList.map(realm => {
                       return (
@@ -291,7 +293,7 @@ class Home extends React.Component {
                       )
                     })}
                   </select>
-                  <input id="userCharacter" type="text" placeholder="Character Name" className="input input-bordered input-secondary w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} />
+                  <input id="userCharacter" type="text" placeholder="Character Name" className="input input-bordered input-secondary w-52 max-w-xs" name="userCharacter" onChange={this.handleChange} disabled={disableSearches} />
                 </div>
                 <button className="btn btn-primary rounded-lg" onClick={this.getProfile}>
                   <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">{/* <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --> */}<path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>  
