@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { handleErrors, safeCredentials } from '@utils/fetchHelper';
 import Layout from '@comps/layout/layout';
 import Filters from '@comps/filters/filters';
@@ -354,8 +354,7 @@ class Home extends React.Component {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(
-    <Home />,
-    document.body.appendChild(document.createElement('div')),
-  )
-})
+  const container = document.body.appendChild(document.createElement('div'));
+  const root = createRoot(container);
+  root.render(<Home />);
+});
