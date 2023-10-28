@@ -287,7 +287,7 @@ class Home extends React.Component {
                   </select>
                   <select id="userRealm" className="realm select select-secondary w-44" name="userRealm" onChange={this.handleChange} disabled={disableSearches}>
                     <option value="">Select a Realm</option>
-                    {realmList.map(realm => {
+                    {realmList.slice().sort((a, b) => a.name.localeCompare(b.name)).map(realm => {
                       return (
                         <option key={realm.id} value={realm.slug}>{realm.name}</option>
                       )
