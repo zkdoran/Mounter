@@ -34,9 +34,9 @@ class Mounts extends Component {
               }
 
               return (
-                <div key={mount.id} className="card w-96 h-50 bg-base-100 shadow-xl image-full">
+                <div key={mount.id} className="card w-50 h-50 bg-base-100 shadow-xl image-full">
                   <figure>
-                    <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="object-fill" alt="Oooo Pretty" onError={(e) => {
+                    <img src={`https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${mount.mount_detail.creature_displays}.jpg`} className="object-fill w-full h-full" alt="Oooo Pretty" onError={(e) => {
                       e.target.src = myImg
                       e.target.alt = 'No Image Found'
                     }} />
