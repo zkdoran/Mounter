@@ -81,7 +81,7 @@ BLIZZARD_CLIENT_SECRET=<Your Key>
 
 * **World of Warcraft**® will be referred to as **WoW** in this section.
 
-I took this project is sections. Funnily enough the front-end was the last section I could work on since I needed to acquire and format all the data in the back-end before I could arrange it correctly.
+I took this project in sections. Funnily enough the front-end was the last section I could work on since I needed to acquire and format all the data in the back-end before I could arrange it correctly.
 
 Before I found the Blizzard Api Gem I was planning on using [Httparty](https://github.com/jnunemaker/httpartyv) and doing all the token creation, saving, responses myself. Thankfully the Blizzard Api Gem covered that for me.
 
